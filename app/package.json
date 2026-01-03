@@ -1,0 +1,22 @@
+{
+  "name": "autotrust-paymesh-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.51.23",
+    "next": "14.2.6",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "viem": "^2.20.0",
+    "wagmi": "^2.12.7"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7"
+  }
+}

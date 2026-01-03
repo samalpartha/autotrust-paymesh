@@ -1,0 +1,12 @@
+node_modules
+.env
+.env.local
+contracts/.env
+backend/.env
+app/.env.local
+dist
+.next
+out
+
+# Local credentials (never commit!)
+LOCAL_CREDENTIALS.md
