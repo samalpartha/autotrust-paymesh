@@ -1,9 +1,9 @@
 # AutoTrust Paymesh — MNEE Escrow Settlement System
 
 > **Track:** Best AI / Agent Payments  
-> **Why it wins:** Proves programmable money (conditional settlement) with clean on-chain audit trails.
+> *Proves programmable money (conditional settlement) with clean on-chain audit trails.
 
-A hackathon-ready, production-minded reference build for **programmable money** using the **MNEE ERC-20 stablecoin** on Ethereum.
+A production-minded reference build for **programmable money** using the **MNEE ERC-20 stablecoin** on Ethereum.
 
 ## What It Demonstrates
 
