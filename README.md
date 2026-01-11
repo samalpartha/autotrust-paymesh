@@ -48,12 +48,48 @@ graph TD
 
 ### 1. Frontend Layer (The "Console")
 Built on **Next.js 14**, the frontend serves as the command center for human operators to observe autonomous agent flows.
+
+```mermaid
+graph TD
+    subgraph "User Interface"
+        Layout[Root Layout] --> Providers[Web3 & Theme Providers]
+        Providers --> Pages[App Pages]
+        Pages --> Components[Feature Components]
+    end
+
+    subgraph "State & Logic"
+        Components --> Context[Escrow Context]
+        Components --> Hooks[Custom Wagmi Hooks]
+        Hooks --> Viem[Viem Protocol Client]
+    end
+
+    Viem --> Blockchain((Localhost Node))
+```
+
 *   **Web3 Integration:** Uses `wagmi` and `viem` for robust wallet connection and contract interaction.
 *   **State Management:** React Context (`ThemeContext`, `EscrowContext`) handles cross-component state like active deployments and agent verification results.
 *   **Client-Side AI:** Direct swarms of simulated agents run in the browser for the "Negotiation Sandbox" demo, using local logic to simulate multi-turn bargaining before hitting the chain.
 
 ### 2. Backend Intelligence Layer (The "Brain")
 A **Node.js/Express** execution environment that acts as the off-chain compute engine for AI agents.
+
+```mermaid
+graph TD
+    subgraph "API Layer"
+        Routes[Express Routes] --> Controllers[Logic Controllers]
+        Controllers --> Services[Agent Services]
+    end
+
+    subgraph "Intelligence Engine"
+        Services --> RAG[RAG Knowledge Base]
+        Services --> Groq[Groq SDK]
+        RAG --> Docs[Policy Documents]
+        Groq --> Model((Llama 3.3-70b))
+    end
+
+    Services --> Blockchain((Smart Contracts))
+```
+
 *   **AI Engine:** Integrates **Groq (Llama 3.3-70b)** for ultra-low latency inference, crucial for real-time agent responses.
 *   **RAG System:** `knowledge-base.js` provides a specialized vector-like retrieval system, feeding the MeshMind Copilot with specific policy data, contract states, and documentation context.
 *   **Orchestration:** Manages the lifecycle of "Compliance," "Operations," and "Arbiter" agents, aggregating their individual confidence scores into a final decision payload for the smart contract.
