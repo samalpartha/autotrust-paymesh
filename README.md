@@ -44,6 +44,26 @@ graph TD
     Agents --> AIEngine
 ```
 
+## 🧩 Architectural Deep Dive
+
+### 1. Frontend Layer (The "Console")
+Built on **Next.js 14**, the frontend serves as the command center for human operators to observe autonomous agent flows.
+*   **Web3 Integration:** Uses `wagmi` and `viem` for robust wallet connection and contract interaction.
+*   **State Management:** React Context (`ThemeContext`, `EscrowContext`) handles cross-component state like active deployments and agent verification results.
+*   **Client-Side AI:** Direct swarms of simulated agents run in the browser for the "Negotiation Sandbox" demo, using local logic to simulate multi-turn bargaining before hitting the chain.
+
+### 2. Backend Intelligence Layer (The "Brain")
+A **Node.js/Express** execution environment that acts as the off-chain compute engine for AI agents.
+*   **AI Engine:** Integrates **Groq (Llama 3.3-70b)** for ultra-low latency inference, crucial for real-time agent responses.
+*   **RAG System:** `knowledge-base.js` provides a specialized vector-like retrieval system, feeding the MeshMind Copilot with specific policy data, contract states, and documentation context.
+*   **Orchestration:** Manages the lifecycle of "Compliance," "Operations," and "Arbiter" agents, aggregating their individual confidence scores into a final decision payload for the smart contract.
+
+### 3. Protocol Layer (The "Truth")
+The solidity smart contracts (`MNEEEscrow.sol`) enforce the economic physics of the system.
+*   **State Machine:** The contract implements a rigid state machine (`Funded` -> `Locked` -> `Release/Refund`) that prevents invalid transitions.
+*   **MNEE Integration:** Native integration with the MNEE token standard allows for "Streaming" logic (calculating delta balances over time blocks) without gas-heavy loops.
+*   **Access Control:** Role-based logic (`onlyArbiter`, `onlyPayer`) ensures that even AI agents must prove their cryptographic identity to trigger fund movements.
+
 ---
 
 ## 📋 Workflows
