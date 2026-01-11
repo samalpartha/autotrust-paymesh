@@ -26,22 +26,43 @@ import type {
 export interface MNEEEscrowInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "createEscrow"
+      | "DISPUTE_TIMEOUT"
+      | "MAX_EXTENSION"
+      | "MIN_AMOUNT"
+      | "MNEE_MAINNET"
+      | "authorizedAgents"
+      | "createEscrow(bytes32,address,uint256,address,uint64,bytes32)"
+      | "createEscrow(bytes32,address,uint256,address,uint64)"
+      | "dispute"
+      | "escrowCount"
       | "escrows"
+      | "extendDeadline"
+      | "getEscrow"
+      | "isAuthorizedAgent"
+      | "isExpired"
       | "owner"
       | "pause"
       | "paused"
       | "refund"
       | "release"
+      | "releasePartial"
+      | "remainingBalance"
       | "renounceOwnership"
+      | "resolveDispute"
+      | "setAgentAuthorization"
       | "token"
+      | "totalValueLocked"
       | "transferOwnership"
       | "unpause"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
+      | "AgentAuthorized"
+      | "DeadlineExtended"
+      | "DisputeResolved"
       | "EscrowCreated"
+      | "EscrowDisputed"
       | "EscrowRefunded"
       | "EscrowReleased"
       | "OwnershipTransferred"
@@ -50,20 +71,92 @@ export interface MNEEEscrowInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "createEscrow",
+    functionFragment: "DISPUTE_TIMEOUT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MAX_EXTENSION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MIN_AMOUNT",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MNEE_MAINNET",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "authorizedAgents",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createEscrow(bytes32,address,uint256,address,uint64,bytes32)",
+    values: [
+      BytesLike,
+      AddressLike,
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
+      BytesLike
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createEscrow(bytes32,address,uint256,address,uint64)",
     values: [BytesLike, AddressLike, BigNumberish, AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "dispute", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "escrowCount",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "escrows", values: [BytesLike]): string;
+  encodeFunctionData(
+    functionFragment: "extendDeadline",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getEscrow",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isAuthorizedAgent",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isExpired",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "refund", values: [BytesLike]): string;
   encodeFunctionData(functionFragment: "release", values: [BytesLike]): string;
   encodeFunctionData(
+    functionFragment: "releasePartial",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "remainingBalance",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "resolveDispute",
+    values: [BytesLike, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setAgentAuthorization",
+    values: [AddressLike, boolean]
+  ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "totalValueLocked",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
@@ -71,25 +164,141 @@ export interface MNEEEscrowInterface extends Interface {
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "createEscrow",
+    functionFragment: "DISPUTE_TIMEOUT",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MAX_EXTENSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "MIN_AMOUNT", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "MNEE_MAINNET",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "authorizedAgents",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createEscrow(bytes32,address,uint256,address,uint64,bytes32)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createEscrow(bytes32,address,uint256,address,uint64)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "dispute", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "escrowCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "escrows", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "extendDeadline",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getEscrow", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isAuthorizedAgent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "isExpired", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "refund", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "release", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "releasePartial",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "remainingBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "resolveDispute",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setAgentAuthorization",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "totalValueLocked",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+}
+
+export namespace AgentAuthorizedEvent {
+  export type InputTuple = [agent: AddressLike, authorized: boolean];
+  export type OutputTuple = [agent: string, authorized: boolean];
+  export interface OutputObject {
+    agent: string;
+    authorized: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace DeadlineExtendedEvent {
+  export type InputTuple = [
+    escrowId: BytesLike,
+    oldDeadline: BigNumberish,
+    newDeadline: BigNumberish
+  ];
+  export type OutputTuple = [
+    escrowId: string,
+    oldDeadline: bigint,
+    newDeadline: bigint
+  ];
+  export interface OutputObject {
+    escrowId: string;
+    oldDeadline: bigint;
+    newDeadline: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace DisputeResolvedEvent {
+  export type InputTuple = [
+    escrowId: BytesLike,
+    resolvedBy: AddressLike,
+    releasedToPayee: boolean,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [
+    escrowId: string,
+    resolvedBy: string,
+    releasedToPayee: boolean,
+    amount: bigint
+  ];
+  export interface OutputObject {
+    escrowId: string;
+    resolvedBy: string;
+    releasedToPayee: boolean;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace EscrowCreatedEvent {
@@ -99,7 +308,8 @@ export namespace EscrowCreatedEvent {
     payee: AddressLike,
     arbiter: AddressLike,
     amount: BigNumberish,
-    deadline: BigNumberish
+    deadline: BigNumberish,
+    metadataHash: BytesLike
   ];
   export type OutputTuple = [
     escrowId: string,
@@ -107,7 +317,8 @@ export namespace EscrowCreatedEvent {
     payee: string,
     arbiter: string,
     amount: bigint,
-    deadline: bigint
+    deadline: bigint,
+    metadataHash: string
   ];
   export interface OutputObject {
     escrowId: string;
@@ -116,6 +327,29 @@ export namespace EscrowCreatedEvent {
     arbiter: string;
     amount: bigint;
     deadline: bigint;
+    metadataHash: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace EscrowDisputedEvent {
+  export type InputTuple = [
+    escrowId: BytesLike,
+    disputedBy: AddressLike,
+    disputedAt: BigNumberish
+  ];
+  export type OutputTuple = [
+    escrowId: string,
+    disputedBy: string,
+    disputedAt: bigint
+  ];
+  export interface OutputObject {
+    escrowId: string;
+    disputedBy: string;
+    disputedAt: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -145,13 +379,20 @@ export namespace EscrowReleasedEvent {
   export type InputTuple = [
     escrowId: BytesLike,
     to: AddressLike,
-    amount: BigNumberish
+    amount: BigNumberish,
+    remaining: BigNumberish
   ];
-  export type OutputTuple = [escrowId: string, to: string, amount: bigint];
+  export type OutputTuple = [
+    escrowId: string,
+    to: string,
+    amount: bigint,
+    remaining: bigint
+  ];
   export interface OutputObject {
     escrowId: string;
     to: string;
     amount: bigint;
+    remaining: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -239,7 +480,30 @@ export interface MNEEEscrow extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  createEscrow: TypedContractMethod<
+  DISPUTE_TIMEOUT: TypedContractMethod<[], [bigint], "view">;
+
+  MAX_EXTENSION: TypedContractMethod<[], [bigint], "view">;
+
+  MIN_AMOUNT: TypedContractMethod<[], [bigint], "view">;
+
+  MNEE_MAINNET: TypedContractMethod<[], [string], "view">;
+
+  authorizedAgents: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+
+  "createEscrow(bytes32,address,uint256,address,uint64,bytes32)": TypedContractMethod<
+    [
+      escrowId: BytesLike,
+      payee: AddressLike,
+      amount: BigNumberish,
+      arbiter: AddressLike,
+      deadline: BigNumberish,
+      metadataHash: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+
+  "createEscrow(bytes32,address,uint256,address,uint64)": TypedContractMethod<
     [
       escrowId: BytesLike,
       payee: AddressLike,
@@ -251,20 +515,79 @@ export interface MNEEEscrow extends BaseContract {
     "nonpayable"
   >;
 
+  dispute: TypedContractMethod<[escrowId: BytesLike], [void], "nonpayable">;
+
+  escrowCount: TypedContractMethod<[], [bigint], "view">;
+
   escrows: TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, string, bigint, bigint, bigint] & {
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
         payer: string;
         payee: string;
         arbiter: string;
         amount: bigint;
+        released: bigint;
         deadline: bigint;
+        disputedAt: bigint;
         status: bigint;
+        metadataHash: string;
       }
     ],
     "view"
   >;
+
+  extendDeadline: TypedContractMethod<
+    [escrowId: BytesLike, extension: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  getEscrow: TypedContractMethod<
+    [escrowId: BytesLike],
+    [
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
+        payer: string;
+        payee: string;
+        arbiter: string;
+        amount: bigint;
+        released: bigint;
+        deadline: bigint;
+        disputedAt: bigint;
+        status: bigint;
+        metadataHash: string;
+      }
+    ],
+    "view"
+  >;
+
+  isAuthorizedAgent: TypedContractMethod<
+    [agent: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  isExpired: TypedContractMethod<[escrowId: BytesLike], [boolean], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
@@ -276,9 +599,35 @@ export interface MNEEEscrow extends BaseContract {
 
   release: TypedContractMethod<[escrowId: BytesLike], [void], "nonpayable">;
 
+  releasePartial: TypedContractMethod<
+    [escrowId: BytesLike, partialAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  remainingBalance: TypedContractMethod<
+    [escrowId: BytesLike],
+    [bigint],
+    "view"
+  >;
+
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
+  resolveDispute: TypedContractMethod<
+    [escrowId: BytesLike, releaseToPayee: boolean],
+    [void],
+    "nonpayable"
+  >;
+
+  setAgentAuthorization: TypedContractMethod<
+    [agent: AddressLike, authorized: boolean],
+    [void],
+    "nonpayable"
+  >;
+
   token: TypedContractMethod<[], [string], "view">;
+
+  totalValueLocked: TypedContractMethod<[], [bigint], "view">;
 
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
@@ -293,7 +642,36 @@ export interface MNEEEscrow extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "createEscrow"
+    nameOrSignature: "DISPUTE_TIMEOUT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MAX_EXTENSION"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MIN_AMOUNT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "MNEE_MAINNET"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "authorizedAgents"
+  ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "createEscrow(bytes32,address,uint256,address,uint64,bytes32)"
+  ): TypedContractMethod<
+    [
+      escrowId: BytesLike,
+      payee: AddressLike,
+      amount: BigNumberish,
+      arbiter: AddressLike,
+      deadline: BigNumberish,
+      metadataHash: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "createEscrow(bytes32,address,uint256,address,uint64)"
   ): TypedContractMethod<
     [
       escrowId: BytesLike,
@@ -306,21 +684,82 @@ export interface MNEEEscrow extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "dispute"
+  ): TypedContractMethod<[escrowId: BytesLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "escrowCount"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "escrows"
   ): TypedContractMethod<
     [arg0: BytesLike],
     [
-      [string, string, string, bigint, bigint, bigint] & {
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
         payer: string;
         payee: string;
         arbiter: string;
         amount: bigint;
+        released: bigint;
         deadline: bigint;
+        disputedAt: bigint;
         status: bigint;
+        metadataHash: string;
       }
     ],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "extendDeadline"
+  ): TypedContractMethod<
+    [escrowId: BytesLike, extension: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "getEscrow"
+  ): TypedContractMethod<
+    [escrowId: BytesLike],
+    [
+      [
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string
+      ] & {
+        payer: string;
+        payee: string;
+        arbiter: string;
+        amount: bigint;
+        released: bigint;
+        deadline: bigint;
+        disputedAt: bigint;
+        status: bigint;
+        metadataHash: string;
+      }
+    ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "isAuthorizedAgent"
+  ): TypedContractMethod<[agent: AddressLike], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "isExpired"
+  ): TypedContractMethod<[escrowId: BytesLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "owner"
   ): TypedContractMethod<[], [string], "view">;
@@ -337,11 +776,38 @@ export interface MNEEEscrow extends BaseContract {
     nameOrSignature: "release"
   ): TypedContractMethod<[escrowId: BytesLike], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "releasePartial"
+  ): TypedContractMethod<
+    [escrowId: BytesLike, partialAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "remainingBalance"
+  ): TypedContractMethod<[escrowId: BytesLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "resolveDispute"
+  ): TypedContractMethod<
+    [escrowId: BytesLike, releaseToPayee: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "setAgentAuthorization"
+  ): TypedContractMethod<
+    [agent: AddressLike, authorized: boolean],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "token"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "totalValueLocked"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
@@ -350,11 +816,39 @@ export interface MNEEEscrow extends BaseContract {
   ): TypedContractMethod<[], [void], "nonpayable">;
 
   getEvent(
+    key: "AgentAuthorized"
+  ): TypedContractEvent<
+    AgentAuthorizedEvent.InputTuple,
+    AgentAuthorizedEvent.OutputTuple,
+    AgentAuthorizedEvent.OutputObject
+  >;
+  getEvent(
+    key: "DeadlineExtended"
+  ): TypedContractEvent<
+    DeadlineExtendedEvent.InputTuple,
+    DeadlineExtendedEvent.OutputTuple,
+    DeadlineExtendedEvent.OutputObject
+  >;
+  getEvent(
+    key: "DisputeResolved"
+  ): TypedContractEvent<
+    DisputeResolvedEvent.InputTuple,
+    DisputeResolvedEvent.OutputTuple,
+    DisputeResolvedEvent.OutputObject
+  >;
+  getEvent(
     key: "EscrowCreated"
   ): TypedContractEvent<
     EscrowCreatedEvent.InputTuple,
     EscrowCreatedEvent.OutputTuple,
     EscrowCreatedEvent.OutputObject
+  >;
+  getEvent(
+    key: "EscrowDisputed"
+  ): TypedContractEvent<
+    EscrowDisputedEvent.InputTuple,
+    EscrowDisputedEvent.OutputTuple,
+    EscrowDisputedEvent.OutputObject
   >;
   getEvent(
     key: "EscrowRefunded"
@@ -393,7 +887,40 @@ export interface MNEEEscrow extends BaseContract {
   >;
 
   filters: {
-    "EscrowCreated(bytes32,address,address,address,uint256,uint64)": TypedContractEvent<
+    "AgentAuthorized(address,bool)": TypedContractEvent<
+      AgentAuthorizedEvent.InputTuple,
+      AgentAuthorizedEvent.OutputTuple,
+      AgentAuthorizedEvent.OutputObject
+    >;
+    AgentAuthorized: TypedContractEvent<
+      AgentAuthorizedEvent.InputTuple,
+      AgentAuthorizedEvent.OutputTuple,
+      AgentAuthorizedEvent.OutputObject
+    >;
+
+    "DeadlineExtended(bytes32,uint64,uint64)": TypedContractEvent<
+      DeadlineExtendedEvent.InputTuple,
+      DeadlineExtendedEvent.OutputTuple,
+      DeadlineExtendedEvent.OutputObject
+    >;
+    DeadlineExtended: TypedContractEvent<
+      DeadlineExtendedEvent.InputTuple,
+      DeadlineExtendedEvent.OutputTuple,
+      DeadlineExtendedEvent.OutputObject
+    >;
+
+    "DisputeResolved(bytes32,address,bool,uint256)": TypedContractEvent<
+      DisputeResolvedEvent.InputTuple,
+      DisputeResolvedEvent.OutputTuple,
+      DisputeResolvedEvent.OutputObject
+    >;
+    DisputeResolved: TypedContractEvent<
+      DisputeResolvedEvent.InputTuple,
+      DisputeResolvedEvent.OutputTuple,
+      DisputeResolvedEvent.OutputObject
+    >;
+
+    "EscrowCreated(bytes32,address,address,address,uint256,uint64,bytes32)": TypedContractEvent<
       EscrowCreatedEvent.InputTuple,
       EscrowCreatedEvent.OutputTuple,
       EscrowCreatedEvent.OutputObject
@@ -402,6 +929,17 @@ export interface MNEEEscrow extends BaseContract {
       EscrowCreatedEvent.InputTuple,
       EscrowCreatedEvent.OutputTuple,
       EscrowCreatedEvent.OutputObject
+    >;
+
+    "EscrowDisputed(bytes32,address,uint64)": TypedContractEvent<
+      EscrowDisputedEvent.InputTuple,
+      EscrowDisputedEvent.OutputTuple,
+      EscrowDisputedEvent.OutputObject
+    >;
+    EscrowDisputed: TypedContractEvent<
+      EscrowDisputedEvent.InputTuple,
+      EscrowDisputedEvent.OutputTuple,
+      EscrowDisputedEvent.OutputObject
     >;
 
     "EscrowRefunded(bytes32,address,uint256)": TypedContractEvent<
@@ -415,7 +953,7 @@ export interface MNEEEscrow extends BaseContract {
       EscrowRefundedEvent.OutputObject
     >;
 
-    "EscrowReleased(bytes32,address,uint256)": TypedContractEvent<
+    "EscrowReleased(bytes32,address,uint256,uint256)": TypedContractEvent<
       EscrowReleasedEvent.InputTuple,
       EscrowReleasedEvent.OutputTuple,
       EscrowReleasedEvent.OutputObject

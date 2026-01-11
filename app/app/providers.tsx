@@ -1,14 +1,43 @@
 'use client';
 
+/**
+ * AutoTrust Paymesh - Wagmi Provider Configuration
+ * 
+ * References:
+ * - wagmi: https://wagmi.sh
+ * - MetaMask: https://metamask.io
+ * - Ethereum: https://ethereum.org/developers
+ */
+
 import React from "react";
 import { WagmiProvider, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { createConfig, type Chain } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { injected, coinbaseWallet } from "wagmi/connectors";
+import { ThemeProvider } from "../context/ThemeContext";
+import { ToastProvider } from "../components/Toast";
 
-const queryClient = new QueryClient();
+// ============================================================================
+// QUERY CLIENT CONFIGURATION
+// ============================================================================
 
-// Hardhat local chain definition
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1 minute
+      gcTime: 1000 * 60 * 5, // 5 minutes (formerly cacheTime)
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// ============================================================================
+// CHAIN DEFINITIONS
+// ============================================================================
+
+// Hardhat local chain for development
 const hardhatLocal: Chain = {
   id: 31337,
   name: "Hardhat Local",
@@ -16,30 +45,61 @@ const hardhatLocal: Chain = {
   rpcUrls: {
     default: { http: ["http://127.0.0.1:8545"] },
   },
+  testnet: true,
 };
 
 // Determine which chain to use based on NEXT_PUBLIC_CHAIN_ID
 const chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 1);
+const isLocal = chainId === 31337;
 
-const chains: readonly [Chain, ...Chain[]] = chainId === 31337
+// Order chains with preferred chain first
+const chains: readonly [Chain, ...Chain[]] = isLocal
   ? [hardhatLocal, mainnet]
   : [mainnet, hardhatLocal];
 
+// ============================================================================
+// WAGMI CONFIG
+// ============================================================================
+
 const config = createConfig({
   chains,
+  connectors: [
+    // Injected wallets (MetaMask, Brave, etc.) - primary connector
+    injected({
+      shimDisconnect: true,
+    }),
+    // Coinbase Wallet
+    coinbaseWallet({
+      appName: "AutoTrust Paymesh",
+      headlessMode: true,
+    }),
+  ],
   transports: {
-    [mainnet.id]: http(),
+    [mainnet.id]: http(
+      process.env.NEXT_PUBLIC_ETH_RPC_URL || "https://mainnet.infura.io/v3/6f5c968a7b2f4d808d99f7ad8a258d65"
+    ),
     [hardhatLocal.id]: http("http://127.0.0.1:8545"),
   },
   ssr: true,
 });
 
+// ============================================================================
+// PROVIDER COMPONENT
+// ============================================================================
+
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </WagmiProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <WagmiProvider config={config}>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </WagmiProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
 
-export { hardhatLocal };
+// Export for use in other components
+export { hardhatLocal, config };

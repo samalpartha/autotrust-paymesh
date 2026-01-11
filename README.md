@@ -1,9 +1,7 @@
 # AutoTrust Paymesh — MNEE Escrow Settlement System
+### The Economic Operating System for Autonomous AI Agents
 
-> **Track:** Best AI / Agent Payments  
-> Proves programmable money (conditional settlement) with clean on-chain audit trails.
-
-A production-minded reference build for **programmable money** using the **MNEE ERC-20 stablecoin** on Ethereum.
+> **AutoTrust** provides the economic infrastructure for AI-to-AI commerce. We simply enable trustless, programmable financial coordination between autonomous agents.
 
 ## What It Demonstrates
 
@@ -17,363 +15,134 @@ A production-minded reference build for **programmable money** using the **MNEE 
 
 ## 🏗️ System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────────────┐
-│                              AUTOTRUST PAYMESH                                       │
-│                         MNEE Escrow Settlement System                                │
-└─────────────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    subgraph "AI Agent Economy"
+        Buyer[AI Buyer] <--> Seller[AI Seller]
+        Buyer <--> Arbiter[AI Arbiter]
+    end
 
-    ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-    │    PAYER     │         │    PAYEE     │         │   ARBITER    │
-    │  (Customer)  │         │  (Service)   │         │   (Judge)    │
-    └──────┬───────┘         └──────┬───────┘         └──────┬───────┘
-           │                        │                        │
-           │ 1. Approve MNEE        │                        │
-           │ 2. Create Escrow       │                        │
-           ▼                        │                        │
-    ┌──────────────────────────────────────────────────────────────────┐
-    │                                                                   │
-    │                     🌐 NEXT.JS FRONTEND                          │
-    │                        (wagmi/viem)                               │
-    │                                                                   │
-    │   ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐     │
-    │   │   Wallet    │    │   Escrow    │    │     Ops Log     │     │
-    │   │   Connect   │───▶│   Console   │───▶│   (Events UI)   │     │
-    │   └─────────────┘    └─────────────┘    └─────────────────┘     │
-    │                                                                   │
-    └────────────────────────────┬─────────────────────────────────────┘
-                                 │
-                    ┌────────────┴────────────┐
-                    │                         │
-                    ▼                         ▼
-    ┌───────────────────────────┐   ┌───────────────────────────┐
-    │                           │   │                           │
-    │   ⛓️ ETHEREUM BLOCKCHAIN   │   │   📊 NODE.JS BACKEND      │
-    │                           │   │      (Event Indexer)      │
-    │  ┌─────────────────────┐  │   │                           │
-    │  │   MNEEEscrow.sol    │  │   │  ┌─────────────────────┐  │
-    │  │   ───────────────   │  │◀──│  │  Event Listeners    │  │
-    │  │                     │  │   │  │  • EscrowCreated    │  │
-    │  │  • createEscrow()   │  │   │  │  • EscrowReleased   │  │
-    │  │  • release()        │──┼───│  │  • EscrowRefunded   │  │
-    │  │  • refund()         │  │   │  └─────────────────────┘  │
-    │  │                     │  │   │                           │
-    │  └─────────────────────┘  │   │  ┌─────────────────────┐  │
-    │                           │   │  │   REST API          │  │
-    │  ┌─────────────────────┐  │   │  │   • GET /events     │  │
-    │  │   MNEE Token        │  │   │  │   • GET /escrow/:id │  │
-    │  │   (ERC-20)          │  │   │  │   • GET /health     │  │
-    │  └─────────────────────┘  │   │  └─────────────────────┘  │
-    │                           │   │                           │
-    └───────────────────────────┘   └───────────────────────────┘
+    subgraph "Paymesh Protocol"
+        Negotiation[Negotiation Sandbox] --> Escrow[Escrow Engine]
+        Escrow --> Streaming[Streaming Payments]
+        Escrow --> Chained[Chained Escrows]
+        
+        Identity[Reputation DID] --> Agents[AI Decision Agents]
+        Agents --> Tribunal[Arbitration Tribunal]
+        Tribunal --> Copilot[MeshMind Copilot]
+    end
 
+    subgraph "Infrastructure Layer"
+        Ethereum[Ethereum / MNEE Token]
+        AIEngine[Groq Llama 3.3 Engine]
+        Integrations[Webhooks / Voice / Data]
+    end
 
-                              💰 ESCROW FLOW
-    ┌─────────────────────────────────────────────────────────────────┐
-    │                                                                  │
-    │   PAYER                    ESCROW                    PAYEE       │
-    │     │                        │                         │        │
-    │     │  ──── approve() ────▶  │                         │        │
-    │     │                        │                         │        │
-    │     │  ── createEscrow() ──▶ │                         │        │
-    │     │      (MNEE locked)     │                         │        │
-    │     │                        │                         │        │
-    │     │                        │ ◀── release() ────      │        │
-    │     │                        │     (by Arbiter)        │        │
-    │     │                        │                         │        │
-    │     │                        │ ──── MNEE ────────────▶ │        │
-    │     │                        │                         │        │
-    │     │  ◀──── refund() ────── │                         │        │
-    │     │   (by Arbiter or       │                         │        │
-    │     │    Payer after         │                         │        │
-    │     │    deadline)           │                         │        │
-    │                                                                  │
-    └─────────────────────────────────────────────────────────────────┘
-
-
-                           📋 STATE MACHINE
-    ┌─────────────────────────────────────────────────────────────────┐
-    │                                                                  │
-    │        ┌────────┐                                               │
-    │        │  NONE  │                                               │
-    │        └───┬────┘                                               │
-    │            │                                                     │
-    │            │ createEscrow()                                      │
-    │            ▼                                                     │
-    │        ┌────────┐                                               │
-    │        │ FUNDED │ ◀─── MNEE locked in contract                  │
-    │        └───┬────┘                                               │
-    │            │                                                     │
-    │      ┌─────┴─────┐                                              │
-    │      │           │                                              │
-    │      ▼           ▼                                              │
-    │  ┌────────┐  ┌──────────┐                                       │
-    │  │RELEASED│  │ REFUNDED │                                       │
-    │  └────────┘  └──────────┘                                       │
-    │      │           │                                              │
-    │      ▼           ▼                                              │
-    │   MNEE →      MNEE →                                            │
-    │   Payee       Payer                                             │
-    │                                                                  │
-    └─────────────────────────────────────────────────────────────────┘
-
-
-                           🔧 TECH STACK
-    ┌─────────────────────────────────────────────────────────────────┐
-    │                                                                  │
-    │   FRONTEND          SMART CONTRACTS       BACKEND               │
-    │   ─────────         ───────────────       ───────               │
-    │   • Next.js 14      • Solidity 0.8.24     • Node.js             │
-    │   • wagmi v2        • OpenZeppelin        • Express             │
-    │   • viem            • Hardhat             • ethers.js v6        │
-    │   • TanStack Query  • ReentrancyGuard     • Event listeners     │
-    │   • TypeScript      • Pausable            • REST API            │
-    │                                                                  │
-    └─────────────────────────────────────────────────────────────────┘
+    Buyer --> Negotiation
+    Seller --> Negotiation
+    Escrow --> Ethereum
+    Agents --> AIEngine
 ```
 
 ---
 
-## Core References
+## 📋 Workflows
 
-| Resource | Value |
-|----------|-------|
-| MNEE Token (Mainnet) | `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF` |
-| Token Decimals | 18 |
-| Swap & Bridge | https://swap-user.mnee.net/ |
-| Etherscan | https://etherscan.io/token/0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF |
+### 🟢 Basic Escrow (Direct Payment)
+1.  **Fund:** Connect wallet and lock MNEE tokens in a bespoke smart contract.
+2.  **Verify:** AI agents monitor the transaction for compliance and delivery.
+3.  **Release:** Click "Release Funds" (or auto-release by AI) to transfer MNEE to the Payee.
+4.  **Track:** View real-time balance updates and transparent Ops Logs.
+
+### 🔵 Negotiation → Escrow
+1.  **Haggle:** Enter the **Negotiation Sandbox** to start an AI-to-AI price discussion.
+2.  **Agree:** Agents reach consensus on price and timeline.
+3.  **Execute:** One-click generation of the Escrow contract based on negotiated terms.
+4.  **Complete:** Successful delivery updates the negotiation status and builds agent reputation.
+
+### 🟣 Streaming Payments
+1.  **Start:** Set a rate (e.g., 0.05 MNEE/sec) and fund the stream.
+2.  **Flow:** Tokens move from `Locked` to `Streamed` in real-time.
+3.  **Stop:** End the stream at any second; you only pay for what was used. Unused funds return to your wallet.
 
 ---
 
-## Monorepo Layout
+## 🚀 Quick Start
 
-```
-autotrust-paymesh/
-  contracts/   # Hardhat + Solidity (OpenZeppelin)
-  backend/     # Node/Express indexer + REST API (ethers.js)
-  app/         # Next.js UI (wagmi/viem)
-```
+### Prerequisites
+*   Node.js 18+
+*   MetaMask (or compatible Web3 wallet)
+*   Git
 
----
-
-## 🚀 Quick Start (100% Free Local Development)
-
-### Step 1: Start Hardhat Local Node
-
+### 1. Start Local Blockchain
 ```bash
 cd contracts
 npm install
-
-# Terminal 1: Start local chain (keep running)
 npm run node
 ```
 
-This prints funded accounts with private keys. **Copy one private key for MetaMask.**
-
-### Step 2: Deploy Contracts Locally
-
+### 2. Deploy Contracts
+In a new terminal:
 ```bash
-# Terminal 2: Deploy (separate terminal)
+cd contracts
 npm run deploy:local
 ```
+*Note the deployed addresses for the next steps.*
 
-Output will show:
-```
-MockERC20 deployed to: 0x5FbDB2...
-MNEEEscrow deployed to: 0xe7f1725...
-
-Add these to your .env files:
-NEXT_PUBLIC_MNEE_TOKEN=0x5FbDB2...
-NEXT_PUBLIC_ESCROW_ADDRESS=0xe7f1725...
-```
-
-**Save these addresses!**
-
-### Step 3: Configure Backend
-
+### 3. Start Backend Services
+In a new terminal:
 ```bash
-cd ../backend
+cd backend
 npm install
-```
-
-Create `backend/.env`:
-```bash
-RPC_URL=http://127.0.0.1:8545
-ESCROW_ADDRESS=0x... # paste your escrow address from Step 2
-PORT=8787
-```
-
-Start backend:
-```bash
+# Create .env with ESCROW_ADDRESS from Step 2
 npm run dev
 ```
 
-### Step 4: Configure Frontend
-
+### 4. Start Frontend Application
+In a new terminal:
 ```bash
-cd ../app
+cd app
 npm install
-```
-
-Create `app/.env.local`:
-```bash
-NEXT_PUBLIC_CHAIN_ID=31337
-NEXT_PUBLIC_MNEE_TOKEN=0x... # paste mock token address from Step 2
-NEXT_PUBLIC_ESCROW_ADDRESS=0x... # paste escrow address from Step 2
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8787
-```
-
-Start frontend:
-```bash
+# Create .env.local with contract addresses
 npm run dev
 ```
 
-### Step 5: Configure MetaMask
-
-1. **Add Network:**
-   - Network Name: `Hardhat Local`
-   - RPC URL: `http://127.0.0.1:8545`
-   - Chain ID: `31337`
-   - Currency Symbol: `ETH`
-
-2. **Import Account:**
-   - Copy a private key from the Hardhat node output (Step 1)
-   - MetaMask → Import Account → Paste private key
-   - This account has 10,000 ETH + 100,000 MNEE (Local)
-
-### Step 6: Open the App
-
-- **UI:** http://localhost:3000
-- **Backend Health:** http://localhost:8787/health
-- **Events API:** http://localhost:8787/events
+### 5. Access
+Open [http://localhost:3005](http://localhost:3005) in your browser.  
+Ensure MetaMask is connected to **Localhost 8545** (Chain ID: 31337).
 
 ---
 
-## 🎬 Demo Flow (5 minutes)
+## 🔧 Tech Stack
 
-1. **Connect wallet** (MetaMask on Hardhat Local)
-2. See MNEE (Local) balance (100,000 pre-minted)
-3. **Open Escrow Console**
-4. Enter payee and arbiter addresses (use another Hardhat account)
-5. **Approve** MNEE allowance
-6. **Create Escrow** → funds move to contract
-7. **Release** (as arbiter) or **Refund** (after deadline)
-8. Watch **Ops Log** update with event details
-
----
-
-## Mainnet Deployment (Costs ETH Gas)
-
-### 1. Configure Environment
-
-Create `contracts/.env`:
-```bash
-DEPLOYER_PRIVATE_KEY=0xYOUR_PRIVATE_KEY
-RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
-MNEE_TOKEN=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
-ETHERSCAN_API_KEY=YOUR_KEY  # optional, for verification
-```
-
-### 2. Deploy
-
-```bash
-cd contracts
-npm run deploy:mainnet
-```
-
-### 3. Verify on Etherscan (Optional)
-
-```bash
-npx hardhat verify --network mainnet <ESCROW_ADDRESS> 0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
-```
-
-### 4. Update Frontend/Backend
-
-Update `app/.env.local`:
-```bash
-NEXT_PUBLIC_CHAIN_ID=1
-NEXT_PUBLIC_MNEE_TOKEN=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
-NEXT_PUBLIC_ESCROW_ADDRESS=0x...  # your deployed address
-```
-
-Update `backend/.env`:
-```bash
-RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
-ESCROW_ADDRESS=0x...  # your deployed address
-```
+| Layer | Technologies |
+|-------|--------------|
+| **Smart Contracts** | Solidity 0.8.24, OpenZeppelin, Hardhat |
+| **Frontend** | Next.js 14, wagmi v2, viem, React 18 |
+| **Backend** | Node.js, Express, ethers.js v6 |
+| **AI Engine** | Groq (Llama 3.3-70b-versatile), RAG |
+| **UI/UX** | Dark/Light themes, i18n (EN/ES), Responsive |
 
 ---
 
-## Smart Contract Design
+## 🔒 Security
 
-### MNEEEscrow.sol
-
-**Entities:**
-- `payer` — funds the escrow
-- `payee` — receives on successful release
-- `arbiter` — can release or refund (judge-friendly role)
-- `deadline` — enables timeout refund
-
-**State Machine:**
-```
-None → Funded → Released
-                → Refunded
-```
-
-**Core Functions:**
-- `createEscrow(escrowId, payee, amount, arbiter, deadline)`
-- `release(escrowId)` — arbiter only
-- `refund(escrowId)` — arbiter anytime, payer after deadline
-
-**Events (for Ops Log):**
-- `EscrowCreated(escrowId, payer, payee, amount, arbiter, deadline)`
-- `EscrowReleased(escrowId, to, amount)`
-- `EscrowRefunded(escrowId, to, amount)`
-
-**Security:**
-- OpenZeppelin `ReentrancyGuard`
-- OpenZeppelin `Pausable` + `Ownable`
-- Unique escrow IDs (reverts if already exists)
-- State validation (can't release after refund)
+*   **Non-Custodial:** We never hold private keys; MNEE is locked in audited smart contracts.
+*   **Reentrancy Protection:** All contracts utilize OpenZeppelin's `ReentrancyGuard`.
+*   **Emergency Stops:** Pausable functionality for crisis management.
+*   **State Machine Logic:** Strict verified transitions between Funded, Released, and Refunded states.
 
 ---
 
-## API Endpoints
+## 🔮 Roadmap
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Service health + contract address |
-| `/events` | GET | All indexed events (most recent first) |
-| `/escrow/:id` | GET | On-chain escrow state by ID |
-
----
-
-## Run Tests
-
-```bash
-cd contracts
-npm test
-```
-
-Tests cover:
-- Create escrow + transfer verification
-- Unique escrowId enforcement
-- Arbiter-only release
-- Payer refund after deadline
-- State transition guards
+| Phase | Focus |
+|-------|-------|
+| **Phase 1** | Mainnet deployment & Work Validator Oracles |
+| **Phase 2** | Mobile App & API Marketplace for Agents |
+| **Phase 3** | Cross-chain support (Arbitrum, Base) |
+| **Phase 4** | Enterprise SDK & White-label solutions |
 
 ---
 
-## Security Notes
-
-- ✅ ReentrancyGuard on all state-changing functions
-- ✅ Pausable for emergency stops
-- ✅ Strict escrow state machine (one-way transitions)
-- ✅ Explicit roles with access control
-- ✅ No ETH custody (ERC-20 only)
-
----
-
-## License
-
-MIT
+*Built with ❤️ for the MNEE Ecosystem.*

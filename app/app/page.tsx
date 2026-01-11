@@ -1,17 +1,16 @@
 'use client';
 
 import React, { useMemo } from "react";
-import { useAccount, useConnect, useDisconnect, useReadContract } from "wagmi";
-import { injected } from "wagmi/connectors";
-import { ERC20_ABI, MNEE_TOKEN, TOKEN_NAME, NETWORK_NAME, IS_LOCAL, ESCROW_ADDRESS } from "../lib/contracts";
-import { formatUnits } from "viem";
-
-const MNEE_SWAP = "https://swap-user.mnee.net/";
+import { useAccount, useReadContract } from "wagmi";
+import { ERC20_ABI, MNEE_TOKEN, TOKEN_NAME, NETWORK_NAME, IS_LOCAL, ESCROW_ADDRESS, formatMNEE } from "../lib/contracts";
+import { WalletConnect } from "../components/WalletConnect";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { useTheme } from "../context/ThemeContext";
+import { Logo, HeroLogo } from "../components/Logo";
 
 export default function Home() {
-  const { address, isConnected, chain } = useAccount();
-  const { connect, isPending } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { address, isConnected } = useAccount();
+  const { isDark, t } = useTheme();
 
   const bal = useReadContract({
     abi: ERC20_ABI,
@@ -23,235 +22,397 @@ export default function Home() {
 
   const balance = useMemo(() => {
     if (!bal.data) return "0";
-    return formatUnits(bal.data as bigint, 18);
+    return formatMNEE(bal.data as bigint);
   }, [bal.data]);
 
   return (
-    <main style={{ minHeight: "100vh", background: IS_LOCAL ? "linear-gradient(145deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)" : "linear-gradient(145deg, #fafafa 0%, #f0f4f8 100%)", color: IS_LOCAL ? "#e0e0e0" : "#111" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: 24 }}>
-        {/* Network Badge */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+    <main style={{ 
+      minHeight: "100vh", 
+      background: isDark 
+        ? "radial-gradient(ellipse at top, #1a1a3e 0%, #0a0a1a 50%, #050510 100%)"
+        : "radial-gradient(ellipse at top, #f8fafc 0%, #e2e8f0 100%)",
+      color: isDark ? "#e0e0e0" : "#111",
+      overflow: "hidden",
+      position: "relative",
+    }}>
+      {/* Animated background elements */}
+      {isDark && (
+        <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+          <div style={{
+            position: "absolute",
+            top: "10%",
+            left: "10%",
+            width: 400,
+            height: 400,
+            background: "radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%)",
+            borderRadius: "50%",
+            filter: "blur(60px)",
+          }} />
+          <div style={{
+            position: "absolute",
+            bottom: "20%",
+            right: "10%",
+            width: 300,
+            height: 300,
+            background: "radial-gradient(circle, rgba(118, 75, 162, 0.15) 0%, transparent 70%)",
+            borderRadius: "50%",
+            filter: "blur(60px)",
+          }} />
+        </div>
+      )}
+
+      <div style={{ width: "100%", padding: "40px 48px", position: "relative", boxSizing: "border-box" }}>
+        {/* Header with network + wallet + theme toggle */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
           <div style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 8,
-            padding: "8px 16px",
+            gap: 6,
+            padding: "6px 12px",
             borderRadius: 20,
-            background: IS_LOCAL ? "rgba(46, 213, 115, 0.15)" : "rgba(99, 102, 241, 0.1)",
-            border: `1px solid ${IS_LOCAL ? "#2ed573" : "#6366f1"}`,
-            fontSize: 13,
-            fontWeight: 600,
+            background: isDark ? "rgba(46, 213, 115, 0.1)" : "rgba(99, 102, 241, 0.08)",
+            border: `1px solid ${isDark ? "rgba(46, 213, 115, 0.3)" : "rgba(99, 102, 241, 0.2)"}`,
+            fontSize: 12,
+            fontWeight: 500,
           }}>
-            <span style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: IS_LOCAL ? "#2ed573" : "#6366f1",
-              animation: "pulse 2s infinite",
-            }} />
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: isDark ? "#2ed573" : "#6366f1" }} />
             {NETWORK_NAME}
           </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <ThemeToggle />
+            {isConnected && <WalletConnect variant="header" />}
+          </div>
         </div>
 
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <div>
-            <h1 style={{ 
-              margin: "0 0 8px 0", 
-              fontSize: 36, 
-              fontWeight: 800,
-              fontFamily: "'Space Grotesk', 'SF Pro Display', system-ui",
-              background: IS_LOCAL ? "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)" : "linear-gradient(135deg, #1a1a2e 0%, #4a4a6a 100%)",
+        {/* Hero */}
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          {/* Centered Spider Web Logo */}
+          <div style={{ marginBottom: 24 }}>
+            <HeroLogo size={140} isDark={isDark} />
+          </div>
+
+          <div style={{ 
+            fontSize: 13, 
+            fontWeight: 600, 
+            color: isDark ? "#667eea" : "#6366f1",
+            marginBottom: 16,
+            letterSpacing: 2.5,
+            textTransform: "uppercase",
+          }}>
+            {t('home.tagline')}
+          </div>
+          
+          <h1 style={{ 
+            margin: "0 0 20px 0", 
+            fontSize: 48, 
+            fontWeight: 800,
+            fontFamily: "'Inter', 'SF Pro Display', system-ui",
+            lineHeight: 1.15,
+            letterSpacing: -1.5,
+          }}>
+            <span style={isDark ? {
+              background: "linear-gradient(135deg, #fff 0%, #a0a0c0 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
+            } : {
+              color: "#1e293b",
             }}>
-              AutoTrust Paymesh
-            </h1>
-            <p style={{ margin: 0, color: IS_LOCAL ? "#a0a0b0" : "#555", fontSize: 15 }}>
-              Programmable {TOKEN_NAME} escrow with audit-ready Ops Log
-            </p>
-          </div>
+              {t('home.title1')}
+            </span>
+            <br />
+            <span style={isDark ? {
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            } : {
+              color: "#6366f1",
+            }}>
+              {t('home.title2')}
+            </span>
+          </h1>
+          
+          <p style={{ 
+            fontSize: 17, 
+            color: isDark ? "#8888a0" : "#64748b", 
+            maxWidth: 650, 
+            margin: "0 auto 36px",
+            lineHeight: 1.7,
+          }}>
+            {t('home.subtitle')}
+          </p>
 
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {/* CTA Buttons */}
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
             {!isConnected ? (
-              <button
-                onClick={() => connect({ connector: injected() })}
-                disabled={isPending}
-                style={primaryBtn(IS_LOCAL)}
-              >
-                {isPending ? "Connecting…" : "Connect Wallet"}
-              </button>
+              <WalletConnect variant="primary" />
             ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ 
-                  fontSize: 12, 
-                  textAlign: "right",
-                  padding: "10px 14px",
-                  background: IS_LOCAL ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.03)",
-                  borderRadius: 12,
-                  border: `1px solid ${IS_LOCAL ? "rgba(255,255,255,0.1)" : "#e5e5e5"}`,
-                }}>
-                  <div style={{ fontWeight: 700, marginBottom: 2 }}>Connected</div>
-                  <div style={{ fontFamily: "ui-monospace, Menlo", fontSize: 11 }}>
-                    {address?.slice(0, 6)}…{address?.slice(-4)}
-                  </div>
-                </div>
-                <button onClick={() => disconnect()} style={secondaryBtn(IS_LOCAL)}>
-                  Disconnect
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Token Info Card */}
-        <div style={card(IS_LOCAL)}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 24, alignItems: "end" }}>
-            <div>
-              <div style={label(IS_LOCAL)}>{TOKEN_NAME} Token Address</div>
-              <div style={mono(IS_LOCAL)}>{MNEE_TOKEN}</div>
-            </div>
-            <div>
-              <div style={label(IS_LOCAL)}>Your {TOKEN_NAME} Balance</div>
-              <div style={{ 
-                fontSize: 28, 
-                fontWeight: 800,
-                fontFamily: "'Space Grotesk', system-ui",
-                color: IS_LOCAL ? "#fff" : "#111",
-              }}>
-                {isConnected ? (
-                  <>
-                    {parseFloat(balance).toLocaleString(undefined, { maximumFractionDigits: 4 })}
-                    <span style={{ fontSize: 14, fontWeight: 500, marginLeft: 6, opacity: 0.6 }}>{TOKEN_NAME}</span>
-                  </>
-                ) : "—"}
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 10 }}>
               <a href="/escrow" style={{ textDecoration: "none" }}>
-                <button style={primaryBtn(IS_LOCAL)} disabled={!isConnected}>
-                  Open Escrow Console →
+                <button style={primaryBtn(isDark)}>
+                  {t('home.openConsole')}
                 </button>
               </a>
-              {!IS_LOCAL && (
-                <a href={MNEE_SWAP} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
-                  <button style={secondaryBtn(IS_LOCAL)}>Get MNEE</button>
-                </a>
-              )}
-            </div>
+            )}
+            <a 
+              href="https://github.com/samalpartha/autotrust-paymesh" 
+              target="_blank" 
+              rel="noreferrer" 
+              style={{ textDecoration: "none" }}
+            >
+              <button style={secondaryBtn(isDark)}>
+                {t('home.viewCode')}
+              </button>
+            </a>
           </div>
         </div>
 
-        {/* Contract Info */}
-        <div style={{ 
-          marginTop: 16, 
-          padding: "12px 16px", 
-          borderRadius: 12, 
-          background: IS_LOCAL ? "rgba(102, 126, 234, 0.1)" : "rgba(99, 102, 241, 0.05)",
-          border: `1px solid ${IS_LOCAL ? "rgba(102, 126, 234, 0.3)" : "rgba(99, 102, 241, 0.2)"}`,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}>
-          <div>
-            <span style={{ fontSize: 12, color: IS_LOCAL ? "#a0a0b0" : "#666" }}>Escrow Contract: </span>
-            <span style={{ fontFamily: "ui-monospace, Menlo", fontSize: 12, color: IS_LOCAL ? "#667eea" : "#6366f1" }}>{ESCROW_ADDRESS}</span>
-          </div>
-        </div>
-
-        {/* Feature Cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 24 }}>
-          <div style={card(IS_LOCAL)}>
-            <h2 style={{ margin: "0 0 16px 0", fontSize: 18, fontWeight: 700 }}>Demo Flow</h2>
-            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-              <li>Approve {TOKEN_NAME} allowance to escrow contract</li>
-              <li>Create escrow with unique escrowId</li>
-              <li>Release (arbiter) or Refund (arbiter/payer after deadline)</li>
-              <li>View on-chain tx hashes in Ops Log</li>
-            </ol>
-          </div>
-
-          <div style={card(IS_LOCAL)}>
-            <h2 style={{ margin: "0 0 16px 0", fontSize: 18, fontWeight: 700 }}>Why This Wins</h2>
-            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-              <li>Programmable money: conditional settlement</li>
-              <li>Auditability: contract emits strong events</li>
-              <li>Real coordination: payer/payee/arbiter flow</li>
-              <li>Reproducible: clean setup + minimal surface</li>
-            </ul>
-          </div>
-        </div>
-
-        {IS_LOCAL && (
+        {/* Connected wallet card */}
+        {isConnected && (
           <div style={{
-            marginTop: 24,
-            padding: 16,
-            borderRadius: 12,
-            background: "rgba(255, 193, 7, 0.1)",
-            border: "1px solid rgba(255, 193, 7, 0.3)",
-            fontSize: 13,
+            maxWidth: 500,
+            margin: "0 auto 60px",
+            padding: 28,
+            borderRadius: 20,
+            background: isDark ? "rgba(255,255,255,0.03)" : "#fff",
+            border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "#e2e8f0"}`,
+            backdropFilter: "blur(20px)",
           }}>
-            <strong style={{ color: "#ffc107" }}>⚡ Local Development Mode</strong>
-            <p style={{ margin: "8px 0 0 0", color: "#a0a0b0" }}>
-              You're running on Hardhat Local (chain 31337). Make sure the local node is running 
-              and you've imported a funded account into MetaMask.
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <div style={{ fontSize: 12, color: isDark ? "#666" : "#94a3b8", marginBottom: 4 }}>
+                  {t('common.wallet')}
+                </div>
+                <div style={{ fontFamily: "ui-monospace", fontSize: 14, fontWeight: 500 }}>
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 12, color: isDark ? "#666" : "#94a3b8", marginBottom: 4 }}>
+                  {TOKEN_NAME}
+                </div>
+                <div style={{ fontSize: 24, fontWeight: 700, fontFamily: "'Inter', system-ui" }}>
+                  {parseFloat(balance).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={() => {}} 
+              style={{ 
+                marginTop: 16, 
+                width: "100%",
+                padding: "10px",
+                borderRadius: 10,
+                border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e2e8f0",
+                background: "transparent",
+                color: isDark ? "#888" : "#64748b",
+                fontSize: 13,
+                cursor: "pointer",
+              }}
+            >
+              {t('common.disconnect')}
+            </button>
           </div>
         )}
-      </div>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
+        {/* Features - clean grid */}
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", 
+          gap: 24,
+          marginBottom: 60,
+        }}>
+          <FeatureCard
+            isDark={isDark}
+            icon="🤖"
+            title={t('home.feature1.title')}
+            description={t('home.feature1.desc')}
+          />
+          <FeatureCard
+            isDark={isDark}
+            icon="💬"
+            title={t('home.feature2.title')}
+            description={t('home.feature2.desc')}
+          />
+          <FeatureCard
+            isDark={isDark}
+            icon="⚡"
+            title={t('home.feature3.title')}
+            description={t('home.feature3.desc')}
+          />
+        </div>
+
+        {/* How it works - minimal */}
+        <div style={{
+          padding: 32,
+          borderRadius: 24,
+          background: isDark ? "rgba(255,255,255,0.02)" : "#fff",
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#e2e8f0"}`,
+          marginBottom: 60,
+        }}>
+          <h2 style={{ 
+            margin: "0 0 32px 0", 
+            fontSize: 14, 
+            fontWeight: 600, 
+            textAlign: "center",
+            color: isDark ? "#666" : "#94a3b8",
+            letterSpacing: 2,
+            textTransform: "uppercase",
+          }}>
+            {t('home.howItWorks')}
+          </h2>
+          
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <Step num={1} title={t('home.step1.title')} desc={t('home.step1.desc')} isDark={isDark} />
+            <Arrow isDark={isDark} />
+            <Step num={2} title={t('home.step2.title')} desc={t('home.step2.desc')} isDark={isDark} />
+            <Arrow isDark={isDark} />
+            <Step num={3} title={t('home.step3.title')} desc={t('home.step3.desc')} isDark={isDark} />
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", 
+          gap: 20,
+          marginBottom: 60,
+        }}>
+          <Stat label="Token" value={TOKEN_NAME} isDark={isDark} />
+          <Stat label="Chain" value={IS_LOCAL ? "Local" : "Ethereum"} isDark={isDark} />
+          <Stat label="Agents" value="3" isDark={isDark} />
+          <Stat label="Endpoints" value="12+" isDark={isDark} />
+        </div>
+
+        {/* Footer */}
+        <div style={{ 
+          textAlign: "center", 
+          paddingTop: 40,
+          borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#e2e8f0"}`,
+        }}>
+          <div style={{ 
+            fontFamily: "ui-monospace", 
+            fontSize: 11, 
+            color: isDark ? "#444" : "#94a3b8",
+            marginBottom: 8,
+          }}>
+            Escrow: {ESCROW_ADDRESS?.slice(0, 10)}...{ESCROW_ADDRESS?.slice(-8)}
+          </div>
+          <div style={{ fontSize: 12, color: isDark ? "#333" : "#cbd5e1" }}>
+            {t('home.footer')}
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
 
-function card(isDark: boolean): React.CSSProperties {
-  return {
-    border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid #e5e5e5",
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 16,
-    background: isDark ? "rgba(255,255,255,0.03)" : "#fff",
-    boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.3)" : "0 4px 24px rgba(0,0,0,0.04)",
-  };
+function FeatureCard({ isDark, icon, title, description }: { 
+  isDark: boolean; 
+  icon: string; 
+  title: string; 
+  description: string 
+}) {
+  return (
+    <div style={{
+      padding: 28,
+      borderRadius: 20,
+      background: isDark ? "rgba(255,255,255,0.02)" : "#fff",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#e2e8f0"}`,
+      transition: "transform 0.2s, box-shadow 0.2s",
+    }}>
+      <div style={{ fontSize: 28, marginBottom: 16 }}>{icon}</div>
+      <h3 style={{ margin: "0 0 8px 0", fontSize: 16, fontWeight: 600 }}>{title}</h3>
+      <p style={{ margin: 0, fontSize: 14, color: isDark ? "#666" : "#64748b", lineHeight: 1.5 }}>
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function Step({ num, title, desc, isDark }: { 
+  num: number; 
+  title: string; 
+  desc: string; 
+  isDark: boolean 
+}) {
+  return (
+    <div style={{ textAlign: "center", flex: 1 }}>
+      <div style={{
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        background: isDark 
+          ? "linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)"
+          : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 12px",
+        fontSize: 18,
+        fontWeight: 700,
+        color: isDark ? "#667eea" : "#fff",
+      }}>
+        {num}
+      </div>
+      <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 13, color: isDark ? "#666" : "#64748b" }}>{desc}</div>
+    </div>
+  );
+}
+
+function Arrow({ isDark }: { isDark: boolean }) {
+  return (
+    <div style={{ 
+      color: isDark ? "#333" : "#cbd5e1", 
+      fontSize: 20,
+      padding: "0 8px",
+    }}>
+      →
+    </div>
+  );
+}
+
+function Stat({ label, value, isDark }: { label: string; value: string; isDark: boolean }) {
+  return (
+    <div style={{
+      padding: 20,
+      borderRadius: 16,
+      background: isDark ? "rgba(255,255,255,0.02)" : "#f8fafc",
+      border: `1px solid ${isDark ? "rgba(255,255,255,0.04)" : "#e2e8f0"}`,
+      textAlign: "center",
+    }}>
+      <div style={{ fontSize: 12, color: isDark ? "#555" : "#94a3b8", marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 18, fontWeight: 700 }}>{value}</div>
+    </div>
+  );
 }
 
 function primaryBtn(isDark: boolean): React.CSSProperties {
   return {
     border: "none",
-    background: isDark ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%)",
+    background: isDark 
+      ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" 
+      : "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
     color: "white",
     borderRadius: 12,
-    padding: "12px 20px",
+    padding: "14px 28px",
     cursor: "pointer",
-    fontWeight: 700,
-    fontSize: 14,
-    transition: "transform 0.2s, box-shadow 0.2s",
+    fontWeight: 600,
+    fontSize: 15,
+    boxShadow: isDark 
+      ? "0 4px 24px rgba(102, 126, 234, 0.25)"
+      : "0 4px 24px rgba(99, 102, 241, 0.25)",
   };
 }
 
 function secondaryBtn(isDark: boolean): React.CSSProperties {
   return {
-    border: isDark ? "1px solid rgba(255,255,255,0.2)" : "1px solid #ccc",
-    background: isDark ? "rgba(255,255,255,0.05)" : "#fff",
-    color: isDark ? "#e0e0e0" : "#333",
+    border: isDark ? "1px solid rgba(255,255,255,0.15)" : "1px solid #e2e8f0",
+    background: isDark ? "rgba(255,255,255,0.03)" : "#fff",
+    color: isDark ? "#a0a0b0" : "#475569",
     borderRadius: 12,
-    padding: "12px 20px",
+    padding: "14px 28px",
     cursor: "pointer",
     fontWeight: 600,
-    fontSize: 14,
+    fontSize: 15,
   };
-}
-
-function label(isDark: boolean): React.CSSProperties {
-  return { fontSize: 12, color: isDark ? "#888" : "#666", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 };
-}
-
-function mono(isDark: boolean): React.CSSProperties {
-  return { fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas", fontSize: 13, wordBreak: "break-all", color: isDark ? "#a0a0b0" : "#444" };
 }

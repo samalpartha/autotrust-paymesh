@@ -17,6 +17,7 @@
     "wagmi": "^2.12.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/react": "19.2.7"
   }
 }
