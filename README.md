@@ -16,6 +16,18 @@
 | **MNEE Token** | `0x9A676e781A523b5d0C0e43731313A708CB607508` |
 | **Chain ID** | `31337` (Hardhat/AutoTrust Devnet) |
 
+> [!NOTE]
+> **MetaMask Warning:** You may see a warning says *"The network name may not correctly match this chain ID."* This is expected because Chain ID `31337` is the default for local Hardhat networks. You can safely ignore this and click **Save**.
+
+### 💸 How to Get Funds
+The **AutoTrust Chain** is a standard Hardhat node. To get test funds, import the **Account #0** private key into your wallet:
+
+- **Private Key:** `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
+- **Balance:** 10,000 ETH (Testnet)
+
+> [!CAUTION]
+> **Security Alert:** This is a public test key. **NEVER** use this account on Ethereum Mainnet or any real network. Use it ONLY for this test deployment.
+
 ## What It Demonstrates
 
 - ✅ MNEE-funded **escrow** with deterministic **release/refund** rules
