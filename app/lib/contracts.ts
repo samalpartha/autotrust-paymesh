@@ -41,7 +41,7 @@ export const IS_LOCAL = CHAIN_ID === 31337;
 export const IS_MAINNET = CHAIN_ID === 1;
 
 export const TOKEN_NAME = IS_LOCAL ? "MNEE (Local)" : "MNEE";
-export const NETWORK_NAME = IS_LOCAL ? "Hardhat Local" : "Ethereum Mainnet";
+export const NETWORK_NAME = IS_LOCAL ? "GoChain Testnet" : "Ethereum Mainnet";
 
 /** Block explorer URL (null for local network) */
 export const EXPLORER_URL = IS_LOCAL ? null : "https://etherscan.io";
@@ -72,7 +72,7 @@ export const SUPPORTED_CHAINS = {
   },
   31337: {
     id: 31337,
-    name: "AutoTrust Cloud",
+    name: "GoChain Testnet",
     rpcUrls: ["https://autotrust-chain-108816008638.us-central1.run.app"],
     blockExplorer: null,
     nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
