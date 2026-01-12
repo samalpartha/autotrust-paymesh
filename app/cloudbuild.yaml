@@ -1,0 +1,19 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: 
+  - 'build'
+  - '-t'
+  - '$_IMAGE_TAG'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_BACKEND_URL=$_BACKEND_URL'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_RPC_URL=$_RPC_URL'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_ESCROW_ADDRESS=$_ESCROW_ADDRESS'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_CHAIN_ID=$_CHAIN_ID'
+  - '--build-arg'
+  - 'NEXT_PUBLIC_MNEE_TOKEN=$_MNEE_TOKEN'
+  - '.'
+images:
+- '$_IMAGE_TAG'

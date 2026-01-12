@@ -13,7 +13,7 @@ const config: HardhatUserConfig = {
     settings: { optimizer: { enabled: true, runs: 200 } },
   },
   networks: {
-    localhost: { url: "http://127.0.0.1:8545" },
+    localhost: { url: `http://127.0.0.1:${process.env.PORT || 8545}` },
     hardhat: {
       chainId: 31337,
     },
