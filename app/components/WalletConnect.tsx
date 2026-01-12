@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAccount, useConnect, useDisconnect, useChainId, useSwitchChain, useBalance } from 'wagmi';
-import { 
-  CHAIN_ID, 
-  NETWORK_NAME, 
-  IS_LOCAL, 
-  shortAddress, 
+import {
+  CHAIN_ID,
+  NETWORK_NAME,
+  IS_LOCAL,
+  shortAddress,
   MNEE_SWAP_URL,
   MNEE_TOKEN,
   formatMNEE,
@@ -50,7 +50,7 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
       const price = await getSimpleGasPrice(rpcUrl);
       setGasPrice(price);
     };
-    
+
     fetchGas();
     const interval = setInterval(fetchGas, 15000); // Every 15 seconds
     return () => clearInterval(interval);
@@ -86,21 +86,21 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
 
         {showModal && (
           <>
-            <div 
-              style={{ position: 'fixed', inset: 0, zIndex: 99 }} 
-              onClick={() => setShowModal(false)} 
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+              onClick={() => setShowModal(false)}
             />
             <div style={dropdownStyle(IS_LOCAL)}>
               <div style={dropdownHeader(IS_LOCAL)}>
                 <span style={{ fontSize: 12, color: IS_LOCAL ? '#888' : '#666' }}>Connected via</span>
                 <span style={{ fontWeight: 600 }}>{connector?.name || 'Wallet'}</span>
               </div>
-              
+
               <div style={dropdownItem(IS_LOCAL)}>
                 <span style={{ fontSize: 12, color: IS_LOCAL ? '#888' : '#666' }}>Network</span>
-                <span style={{ 
-                  fontWeight: 600, 
-                  color: isWrongNetwork ? '#ef4444' : '#22c55e' 
+                <span style={{
+                  fontWeight: 600,
+                  color: isWrongNetwork ? '#ef4444' : '#22c55e'
                 }}>
                   {isWrongNetwork ? `Wrong (${chainId})` : NETWORK_NAME}
                 </span>
@@ -125,8 +125,8 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
               {/* Gas Price */}
               <div style={dropdownItem(IS_LOCAL)}>
                 <span style={{ fontSize: 12, color: IS_LOCAL ? '#888' : '#666' }}>⛽ Gas Price</span>
-                <span style={{ 
-                  fontWeight: 600, 
+                <span style={{
+                  fontWeight: 600,
                   fontFamily: 'ui-monospace, monospace',
                   color: gasPrice ? getCongestionColor(parseFloat(gasPrice) < 20 ? 'low' : parseFloat(gasPrice) < 50 ? 'medium' : 'high') : '#888'
                 }}>
@@ -145,9 +145,9 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
 
               {/* Explorer link */}
               {EXPLORER_URL && address && (
-                <a 
-                  href={getAddressExplorerUrl(address) || '#'} 
-                  target="_blank" 
+                <a
+                  href={getAddressExplorerUrl(address) || '#'}
+                  target="_blank"
                   rel="noreferrer"
                   style={{ textDecoration: 'none' }}
                 >
@@ -158,9 +158,9 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
                 </a>
               )}
 
-              <a 
-                href={MNEE_SWAP_URL} 
-                target="_blank" 
+              <a
+                href={MNEE_SWAP_URL}
+                target="_blank"
                 rel="noreferrer"
                 style={{ textDecoration: 'none' }}
               >
@@ -210,7 +210,7 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
                 <div>
                   <strong>Local Development Mode</strong>
                   <div style={{ fontSize: 12, marginTop: 4 }}>
-                    Add network in MetaMask: RPC <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>http://127.0.0.1:8545</code>, Chain ID <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>31337</code>
+                    Add network in MetaMask: RPC <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>https://autotrust-chain-108816008638.us-central1.run.app</code>, Chain ID <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>31337</code>
                   </div>
                 </div>
               </div>
@@ -243,16 +243,16 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
 
             {error && (
               <div style={errorStyle()}>
-                {error.message.includes('rejected') 
-                  ? 'Connection rejected by user' 
+                {error.message.includes('rejected')
+                  ? 'Connection rejected by user'
                   : error.message.slice(0, 100)}
               </div>
             )}
 
             <div style={{ marginTop: 20, textAlign: 'center' }}>
-              <a 
-                href="https://metamask.io/download/" 
-                target="_blank" 
+              <a
+                href="https://metamask.io/download/"
+                target="_blank"
                 rel="noreferrer"
                 style={{ fontSize: 12, color: IS_LOCAL ? '#667eea' : '#6366f1' }}
               >
@@ -262,9 +262,9 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
 
             {/* Gas indicator */}
             {gasPrice && (
-              <div style={{ 
-                marginTop: 16, 
-                padding: '10px 12px', 
+              <div style={{
+                marginTop: 16,
+                padding: '10px 12px',
                 background: IS_LOCAL ? 'rgba(255,255,255,0.03)' : '#f8f8f8',
                 borderRadius: 8,
                 display: 'flex',
@@ -273,8 +273,8 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
                 fontSize: 12
               }}>
                 <span style={{ color: IS_LOCAL ? '#888' : '#666' }}>⛽ Current Gas</span>
-                <span style={{ 
-                  fontWeight: 600, 
+                <span style={{
+                  fontWeight: 600,
                   color: getCongestionColor(parseFloat(gasPrice) < 20 ? 'low' : parseFloat(gasPrice) < 50 ? 'medium' : 'high')
                 }}>
                   {gasPrice} Gwei
@@ -308,8 +308,8 @@ function getWalletIcon(name: string): React.ReactNode {
 function primaryBtnStyle(isDark: boolean): React.CSSProperties {
   return {
     border: 'none',
-    background: isDark 
-      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+    background: isDark
+      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
       : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
     color: 'white',
     borderRadius: 12,
@@ -317,7 +317,7 @@ function primaryBtnStyle(isDark: boolean): React.CSSProperties {
     cursor: 'pointer',
     fontWeight: 600,
     fontSize: 15,
-    boxShadow: isDark 
+    boxShadow: isDark
       ? '0 4px 24px rgba(102, 126, 234, 0.25)'
       : '0 4px 24px rgba(99, 102, 241, 0.25)',
     transition: 'transform 0.2s, box-shadow 0.2s',

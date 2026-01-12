@@ -47,15 +47,15 @@ export const NETWORK_NAME = IS_LOCAL ? "Hardhat Local" : "Ethereum Mainnet";
 export const EXPLORER_URL = IS_LOCAL ? null : "https://etherscan.io";
 
 /** Get token page on Etherscan */
-export const getTokenExplorerUrl = (address: string) => 
+export const getTokenExplorerUrl = (address: string) =>
   EXPLORER_URL ? `${EXPLORER_URL}/token/${address}` : null;
 
 /** Get transaction page on Etherscan */
-export const getTxExplorerUrl = (txHash: string) => 
+export const getTxExplorerUrl = (txHash: string) =>
   EXPLORER_URL ? `${EXPLORER_URL}/tx/${txHash}` : null;
 
 /** Get address page on Etherscan */
-export const getAddressExplorerUrl = (address: string) => 
+export const getAddressExplorerUrl = (address: string) =>
   EXPLORER_URL ? `${EXPLORER_URL}/address/${address}` : null;
 
 // ============================================================================
@@ -72,8 +72,8 @@ export const SUPPORTED_CHAINS = {
   },
   31337: {
     id: 31337,
-    name: "Hardhat Local",
-    rpcUrls: ["http://127.0.0.1:8545"],
+    name: "AutoTrust Cloud",
+    rpcUrls: ["https://autotrust-chain-108816008638.us-central1.run.app"],
     blockExplorer: null,
     nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   },
@@ -427,7 +427,7 @@ export const ESCROW_ABI = [
 
 export const ESCROW_STATUS = {
   0: "None",
-  1: "Funded", 
+  1: "Funded",
   2: "Released",
   3: "Refunded",
   4: "Disputed",
@@ -449,9 +449,9 @@ export const ESCROW_STATUS_COLORS = {
 export function formatMNEE(amount: bigint | string | number): string {
   const value = typeof amount === 'bigint' ? amount : BigInt(amount);
   const formatted = Number(value) / 1e18;
-  return formatted.toLocaleString(undefined, { 
-    minimumFractionDigits: 0, 
-    maximumFractionDigits: 4 
+  return formatted.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 4
   });
 }
 
@@ -485,16 +485,16 @@ export function timeRemaining(unixSeconds: number): string {
   const now = Date.now();
   const deadline = unixSeconds * 1000;
   const diff = deadline - now;
-  
+
   if (diff <= 0) return "Expired";
-  
+
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  
+
   if (hours > 24) {
     const days = Math.floor(hours / 24);
     return `${days}d ${hours % 24}h`;
   }
-  
+
   return `${hours}h ${minutes}m`;
 }
