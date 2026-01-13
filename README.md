@@ -12,8 +12,8 @@
 ### ☁️ Cloud Deployment Details
 | Service | URL / Address |
 | :--- | :--- |
-| **Escrow Contract** | `0xc6e7DF5E7b4f2A278906862b61205850344D4e7d` |
-| **MNEE Token** | `0x9A676e781A523b5d0C0e43731313A708CB607508` |
+| **Escrow Contract** | `0x8A791620dd6260079BF849Dc5567aDC3F2FdC318` |
+| **MNEE Token** | `0xa513E6E4b8f2a923D98304ec87F64353C4D5C853` |
 | **Chain ID** | `31337` (Hardhat/AutoTrust Devnet) |
 
 > [!NOTE]
@@ -145,6 +145,17 @@ The solidity smart contracts (`MNEEEscrow.sol`) enforce the economic physics of 
 1.  **Start:** Set a rate (e.g., 0.05 MNEE/sec) and fund the stream.
 2.  **Flow:** Tokens move from `Locked` to `Streamed` in real-time.
 3.  **Stop:** End the stream at any second; you only pay for what was used. Unused funds return to your wallet.
+
+### ⚖️ AI Arbitration Tribunal
+1.  **Dispute:** Open a case when terms aren't met.
+2.  **Evidence:** Upload text or document links as evidence.
+3.  **MeshMind Analysis:** The Groq-powered AI judge analyzes the dispute context, evidence, and contract terms.
+4.  **Verdict:** AI provides a deterministic recommendation (Release, Refund, or Split) with detailed reasoning.
+
+### 🧠 MeshMind Copilot
+1.  **Ask:** Query the specialized RAG knowledge assistant about any contract or feature.
+2.  **Verify:** Get real-time summaries of protocol rules and operating procedures.
+3.  **Execute:** Use the copilot to navigate complex multi-agent workflows.
 
 ---
 
