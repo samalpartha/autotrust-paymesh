@@ -17,6 +17,11 @@ const config: HardhatUserConfig = {
     hardhat: {
       chainId: 31337,
     },
+    cloud: {
+      url: "https://autotrust-chain-108816008638.us-central1.run.app",
+      chainId: 31337,
+      accounts: ["0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"]
+    },
     ...(RPC_URL && DEPLOYER_PRIVATE_KEY ? {
       mainnet: {
         url: RPC_URL,

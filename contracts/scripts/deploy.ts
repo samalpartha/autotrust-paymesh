@@ -10,22 +10,22 @@ async function main() {
 
   let tokenAddress: string;
 
-  // For localhost/hardhat, deploy a mock token and mint to deployer
-  if (network.name === "localhost" || network.name === "hardhat") {
+  // For localhost/hardhat/cloud, deploy a mock token and mint to deployer
+  if (network.name === "localhost" || network.name === "hardhat" || network.name === "cloud") {
     console.log("\n--- Local deployment: deploying MockERC20 (MNEE Local) ---");
-    
+
     const Mock = await ethers.getContractFactory("MockERC20");
     const mockToken = await Mock.deploy("MNEE (Local)", "MNEE");
     await mockToken.waitForDeployment();
     tokenAddress = await mockToken.getAddress();
-    
+
     console.log("MockERC20 deployed to:", tokenAddress);
-    
+
     // Mint 100,000 MNEE to deployer for testing
     const mintAmount = ethers.parseUnits("100000", 18);
     await mockToken.mint(deployer.address, mintAmount);
     console.log(`Minted ${ethers.formatUnits(mintAmount, 18)} MNEE to ${deployer.address}`);
-    
+
     // Also mint to Hardhat default accounts for testing convenience
     const signers = await ethers.getSigners();
     for (let i = 1; i < Math.min(signers.length, 5); i++) {
@@ -57,8 +57,8 @@ async function main() {
   console.log(`NEXT_PUBLIC_ESCROW_ADDRESS=${escrowAddress}`);
   console.log(`ESCROW_ADDRESS=${escrowAddress}`);
   console.log("");
-  
-  if (network.name === "localhost" || network.name === "hardhat") {
+
+  if (network.name === "localhost" || network.name === "hardhat" || network.name === "cloud") {
     console.log("For local testing, use these in app/.env.local:");
     console.log(`NEXT_PUBLIC_CHAIN_ID=31337`);
     console.log(`NEXT_PUBLIC_MNEE_TOKEN=${tokenAddress}`);

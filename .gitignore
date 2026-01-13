@@ -13,3 +13,11 @@ LOCAL_CREDENTIALS.md
 
 # Media
 demo.mov
+*.mp4
+*.pdf
+*.png
+*.docx
+~$*.docx
+
+# Cache
+contracts/cache/
