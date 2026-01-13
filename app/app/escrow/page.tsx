@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { ERC20_ABI, ESCROW_ABI, ESCROW_ADDRESS, MNEE_TOKEN, BACKEND_URL, TOKEN_NAME, NETWORK_NAME, EXPLORER_URL } from "../../lib/contracts";
+import { ERC20_ABI, ESCROW_ABI, ESCROW_ADDRESS, MNEE_TOKEN, BACKEND_URL, TOKEN_NAME, NETWORK_NAME, EXPLORER_URL, IS_LOCAL } from "../../lib/contracts";
 import { formatUnits, parseUnits, keccak256, toHex } from "viem";
 import { shortAddr } from "../../lib/utils";
 import { GasIndicator } from "../../components/GasIndicator";
@@ -39,7 +39,7 @@ export default function EscrowConsole() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      switch(e.key.toLowerCase()) {
+      switch (e.key.toLowerCase()) {
         case 'd': setActiveTab('demo'); break;
         case 'e': setActiveTab('escrow'); break;
         case 'a': setActiveTab('agent'); break;
@@ -76,110 +76,110 @@ export default function EscrowConsole() {
           .header-title { font-size: 16px !important; }
         }
       `}</style>
-      <main style={{ 
+      <main style={{
         minHeight: "100vh",
-        background: isDark 
+        background: isDark
           ? "linear-gradient(145deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)"
           : "linear-gradient(145deg, #fafafa 0%, #f0f4f8 100%)",
         color: isDark ? "#e0e0e0" : "#111",
       }}>
-      <div className="main-content" style={{ width: "100%", padding: "24px 32px", boxSizing: "border-box" }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <a href="/" style={{ textDecoration: "none" }}>
-              <Logo size={52} isDark={isDark} />
-            </a>
-            <div>
-              <a href="/" style={{ color: isDark ? "#667eea" : "#6366f1", textDecoration: "none", fontSize: 13 }}>
-                {t('nav.backToHome')}
+        <div className="main-content" style={{ width: "100%", padding: "24px 32px", boxSizing: "border-box" }}>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "center", marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+              <a href="/" style={{ textDecoration: "none" }}>
+                <Logo size={52} isDark={isDark} />
               </a>
-              <h1 style={{ margin: "4px 0 4px 0", fontSize: 24, fontWeight: 800, fontFamily: "'Space Grotesk', system-ui" }}>
-                {t('header.title')}
-              </h1>
-              <p style={{ margin: 0, color: isDark ? "#888" : "#666", fontSize: 13 }}>
-                {t('header.subtitle')}
-              </p>
+              <div>
+                <a href="/" style={{ color: isDark ? "#667eea" : "#6366f1", textDecoration: "none", fontSize: 13 }}>
+                  {t('nav.backToHome')}
+                </a>
+                <h1 style={{ margin: "4px 0 4px 0", fontSize: 24, fontWeight: 800, fontFamily: "'Space Grotesk', system-ui" }}>
+                  {t('header.title')}
+                </h1>
+                <p style={{ margin: 0, color: isDark ? "#888" : "#666", fontSize: 13 }}>
+                  {t('header.subtitle')}
+                </p>
+              </div>
+            </div>
+
+            <div className="header-controls" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <ThemeToggle />
+              <SoundToggle />
+              <NotificationBell />
+              <Tooltip content={t('tooltip.gasPrice')} position="bottom">
+                <GasIndicator />
+              </Tooltip>
+              <Tooltip content={t('tooltip.network')} position="bottom">
+                <div style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 12px",
+                  borderRadius: 16,
+                  background: isDark ? "rgba(46, 213, 115, 0.15)" : "rgba(99, 102, 241, 0.1)",
+                  border: `1px solid ${isDark ? "#2ed573" : "#6366f1"}`,
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: isDark ? "#2ed573" : "#6366f1" }} />
+                  {NETWORK_NAME}
+                </div>
+              </Tooltip>
+              <Tooltip content={t('tooltip.wallet')} position="bottom">
+                <div data-tour="wallet-connect">
+                  <WalletConnect variant="header" />
+                </div>
+              </Tooltip>
             </div>
           </div>
-          
-          <div className="header-controls" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <ThemeToggle />
-            <SoundToggle />
-            <NotificationBell />
-            <Tooltip content={t('tooltip.gasPrice')} position="bottom">
-              <GasIndicator />
-            </Tooltip>
-            <Tooltip content={t('tooltip.network')} position="bottom">
-              <div style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "6px 12px",
-                borderRadius: 16,
-                background: isDark ? "rgba(46, 213, 115, 0.15)" : "rgba(99, 102, 241, 0.1)",
-                border: `1px solid ${isDark ? "#2ed573" : "#6366f1"}`,
-                fontSize: 12,
-                fontWeight: 600,
-              }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: isDark ? "#2ed573" : "#6366f1" }} />
-                {NETWORK_NAME}
-              </div>
-            </Tooltip>
-            <Tooltip content={t('tooltip.wallet')} position="bottom">
-              <div data-tour="wallet-connect">
-                <WalletConnect variant="header" />
-              </div>
-            </Tooltip>
+
+          {/* Tab Navigation */}
+          <div className="tab-nav" style={{ display: "flex", gap: 4, marginBottom: 20, background: isDark ? "rgba(255,255,255,0.05)" : "#f0f0f0", padding: 4, borderRadius: 12, width: "fit-content", flexWrap: "wrap", overflowX: "auto", maxWidth: "100%" }}>
+            {[
+              { id: 'demo', labelKey: 'nav.demo', tooltipKey: 'tooltip.demo', tour: 'demo-tab' },
+              { id: 'escrow', labelKey: 'nav.escrow', tooltipKey: 'tooltip.escrow', tour: 'escrow-tab' },
+              { id: 'agent', labelKey: 'nav.aiAgents', tooltipKey: 'tooltip.aiAgents', tour: 'ai-tab' },
+              { id: 'copilot', labelKey: 'nav.meshMind', tooltipKey: 'tooltip.meshMind', tour: 'meshmind-tab' },
+              { id: 'advanced', labelKey: 'nav.advanced', tooltipKey: 'tooltip.advanced', tour: 'advanced-tab' },
+            ].map(tab => (
+              <Tooltip key={tab.id} content={t(tab.tooltipKey)} position="bottom">
+                <div data-tour={tab.tour}>
+                  <button
+                    onClick={() => setActiveTab(tab.id as any)}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: 8,
+                      border: "none",
+                      background: activeTab === tab.id
+                        ? (isDark ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#fff")
+                        : "transparent",
+                      color: activeTab === tab.id ? (isDark ? "#fff" : "#111") : (isDark ? "#888" : "#666"),
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      fontSize: 14,
+                      boxShadow: activeTab === tab.id ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
+                    }}
+                  >
+                    {t(tab.labelKey)}
+                  </button>
+                </div>
+              </Tooltip>
+            ))}
           </div>
+
+          {activeTab === 'demo' && <DemoTab />}
+          {activeTab === 'escrow' && <EscrowTab />}
+          {activeTab === 'agent' && <AgentTab />}
+          {activeTab === 'copilot' && <CopilotTab />}
+          {activeTab === 'advanced' && <AdvancedTab />}
         </div>
 
-        {/* Tab Navigation */}
-        <div className="tab-nav" style={{ display: "flex", gap: 4, marginBottom: 20, background: isDark ? "rgba(255,255,255,0.05)" : "#f0f0f0", padding: 4, borderRadius: 12, width: "fit-content", flexWrap: "wrap", overflowX: "auto", maxWidth: "100%" }}>
-          {[
-            { id: 'demo', labelKey: 'nav.demo', tooltipKey: 'tooltip.demo', tour: 'demo-tab' },
-            { id: 'escrow', labelKey: 'nav.escrow', tooltipKey: 'tooltip.escrow', tour: 'escrow-tab' },
-            { id: 'agent', labelKey: 'nav.aiAgents', tooltipKey: 'tooltip.aiAgents', tour: 'ai-tab' },
-            { id: 'copilot', labelKey: 'nav.meshMind', tooltipKey: 'tooltip.meshMind', tour: 'meshmind-tab' },
-            { id: 'advanced', labelKey: 'nav.advanced', tooltipKey: 'tooltip.advanced', tour: 'advanced-tab' },
-          ].map(tab => (
-            <Tooltip key={tab.id} content={t(tab.tooltipKey)} position="bottom">
-              <div data-tour={tab.tour}>
-                <button
-                  onClick={() => setActiveTab(tab.id as any)}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: 8,
-                    border: "none",
-                    background: activeTab === tab.id 
-                      ? (isDark ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#fff")
-                      : "transparent",
-                    color: activeTab === tab.id ? (isDark ? "#fff" : "#111") : (isDark ? "#888" : "#666"),
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontSize: 14,
-                    boxShadow: activeTab === tab.id ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
-                  }}
-                >
-                  {t(tab.labelKey)}
-                </button>
-              </div>
-            </Tooltip>
-          ))}
+        {/* Floating Help Button */}
+        <div data-tour="help-button">
+          <HelpButton isDark={isDark} />
         </div>
-
-        {activeTab === 'demo' && <DemoTab />}
-        {activeTab === 'escrow' && <EscrowTab />}
-        {activeTab === 'agent' && <AgentTab />}
-        {activeTab === 'copilot' && <CopilotTab />}
-        {activeTab === 'advanced' && <AdvancedTab />}
-      </div>
-      
-      {/* Floating Help Button */}
-      <div data-tour="help-button">
-        <HelpButton isDark={isDark} />
-      </div>
-    </main>
+      </main>
     </NotificationProvider>
   );
 }
@@ -245,21 +245,21 @@ function DemoTab() {
     setLoading(true);
     setActiveStep(2);
     setStep(2);
-    
+
     log("→ Starting multi-agent AI analysis...");
     await new Promise(r => setTimeout(r, 500));
-    
+
     log("  🔍 Compliance Agent: Checking regulatory compliance...");
     await new Promise(r => setTimeout(r, 400));
     log("     → Risk score: 12/100 (LOW)");
-    
+
     log("  📦 Operations Agent: Verifying delivery evidence...");
     await new Promise(r => setTimeout(r, 400));
     log("     → Evidence confirms service completion");
-    
+
     log("  ⚖️ Arbiter Agent: Computing final recommendation...");
     await new Promise(r => setTimeout(r, 400));
-    
+
     setAiDecision({
       recommendation: "RELEASE",
       confidence: 0.87,
@@ -272,10 +272,10 @@ function DemoTab() {
         arbiter: { action: "RELEASE", confidence: 0.87, agentConsensus: true }
       }
     });
-    
+
     log("✓ CONSENSUS REACHED: RELEASE (87% confidence)");
     log("  All 3 agents agree on recommendation");
-    
+
     setLoading(false);
     setActiveStep(0);
     setStep(3);
@@ -308,7 +308,7 @@ function DemoTab() {
     <div>
       {/* Hero Banner */}
       <div style={{
-        background: isDark 
+        background: isDark
           ? "linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)"
           : "linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)",
         borderRadius: 20,
@@ -364,71 +364,71 @@ function DemoTab() {
           const isActive = activeStep === s.num;
           const isComplete = step >= s.num;
           return (
-          <div key={i} style={{
-            padding: 20,
-            borderRadius: 16,
-            background: isActive 
-              ? (isDark ? "rgba(102, 126, 234, 0.25)" : "rgba(99, 102, 241, 0.15)")
-              : isComplete 
-                ? (isDark ? "rgba(102, 126, 234, 0.12)" : "rgba(99, 102, 241, 0.08)")
-                : (isDark ? "rgba(255,255,255,0.03)" : "#f8f8f8"),
-            border: `2px solid ${isActive ? (isDark ? "#667eea" : "#6366f1") : isComplete ? (isDark ? "rgba(102, 126, 234, 0.5)" : "rgba(99, 102, 241, 0.4)") : "transparent"}`,
-            boxShadow: isActive ? `0 0 20px ${isDark ? "rgba(102, 126, 234, 0.4)" : "rgba(99, 102, 241, 0.3)"}` : "none",
-            textAlign: "center",
-            opacity: isComplete || isActive ? 1 : 0.4,
-            transition: "all 0.3s ease",
-            animation: isActive ? "pulse 1.5s ease-in-out infinite" : "none",
-          }}>
-            <div style={{ fontSize: 24, marginBottom: 8 }}>{isActive && loading ? "⏳" : s.icon}</div>
-            <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: isComplete 
-                ? (isDark ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#6366f1")
-                : (isDark ? "rgba(255,255,255,0.1)" : "#ddd"),
-              color: isComplete ? "#fff" : (isDark ? "#888" : "#999"),
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 12px",
-              fontSize: 16,
-              fontWeight: 700
+            <div key={i} style={{
+              padding: 20,
+              borderRadius: 16,
+              background: isActive
+                ? (isDark ? "rgba(102, 126, 234, 0.25)" : "rgba(99, 102, 241, 0.15)")
+                : isComplete
+                  ? (isDark ? "rgba(102, 126, 234, 0.12)" : "rgba(99, 102, 241, 0.08)")
+                  : (isDark ? "rgba(255,255,255,0.03)" : "#f8f8f8"),
+              border: `2px solid ${isActive ? (isDark ? "#667eea" : "#6366f1") : isComplete ? (isDark ? "rgba(102, 126, 234, 0.5)" : "rgba(99, 102, 241, 0.4)") : "transparent"}`,
+              boxShadow: isActive ? `0 0 20px ${isDark ? "rgba(102, 126, 234, 0.4)" : "rgba(99, 102, 241, 0.3)"}` : "none",
+              textAlign: "center",
+              opacity: isComplete || isActive ? 1 : 0.4,
+              transition: "all 0.3s ease",
+              animation: isActive ? "pulse 1.5s ease-in-out infinite" : "none",
             }}>
-              {step > s.num ? "✓" : s.num}
+              <div style={{ fontSize: 24, marginBottom: 8 }}>{isActive && loading ? "⏳" : s.icon}</div>
+              <div style={{
+                width: 36,
+                height: 36,
+                borderRadius: 10,
+                background: isComplete
+                  ? (isDark ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" : "#6366f1")
+                  : (isDark ? "rgba(255,255,255,0.1)" : "#ddd"),
+                color: isComplete ? "#fff" : (isDark ? "#888" : "#999"),
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 12px",
+                fontSize: 16,
+                fontWeight: 700
+              }}>
+                {step > s.num ? "✓" : s.num}
+              </div>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t(s.titleKey)}</div>
+              <div style={{ fontSize: 12, color: isDark ? "#888" : "#666" }}>{t(s.descKey)}</div>
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{t(s.titleKey)}</div>
-            <div style={{ fontSize: 12, color: isDark ? "#888" : "#666" }}>{t(s.descKey)}</div>
-          </div>
           );
         })}
       </div>
 
       {/* Action Buttons */}
       <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
-        <button 
-          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step >= 1 ? 0.6 : 1 }} 
+        <button
+          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step >= 1 ? 0.6 : 1 }}
           onClick={loadDemoData}
           disabled={loading || step >= 1}
         >
           {loading && activeStep === 1 ? `⏳ ${t('common.loading')}` : step >= 1 ? "✓" : ""} {t('demo.loadEscrow')}
         </button>
-        <button 
-          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step < 1 || step >= 3 ? 0.6 : 1 }} 
+        <button
+          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step < 1 || step >= 3 ? 0.6 : 1 }}
           onClick={simulateAI}
           disabled={loading || step < 1 || step >= 3}
         >
           {loading && activeStep === 2 ? `🧠 ${t('common.analyzing')}` : step >= 3 ? "✓" : ""} {t('demo.runAI')}
         </button>
-        <button 
-          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step < 3 ? 0.6 : 1 }} 
+        <button
+          style={{ ...primaryBtn(isDark), padding: "14px 24px", fontSize: 15, opacity: step < 3 ? 0.6 : 1 }}
           onClick={demoCopilot}
           disabled={loading || step < 3}
         >
           {loading && activeStep === 4 ? "💬..." : step >= 4 ? "✓" : ""} {t('demo.askMeshMind')}
         </button>
-        <button 
-          style={{ ...secondaryBtn(isDark), padding: "14px 24px", fontSize: 15 }} 
+        <button
+          style={{ ...secondaryBtn(isDark), padding: "14px 24px", fontSize: 15 }}
           onClick={() => { setStep(0); setActiveStep(0); setDemoData(null); setAiDecision(null); setCopilotResult(null); setActivityLog([]); }}
         >
           {t('demo.reset')}
@@ -461,7 +461,7 @@ function DemoTab() {
             <div style={{ color: "#666", fontStyle: "italic" }}>Waiting for demo actions...</div>
           ) : (
             activityLog.map((log, i) => (
-              <div key={i} style={{ 
+              <div key={i} style={{
                 color: log.includes("✓") ? "#22c55e" : log.includes("✗") ? "#ef4444" : log.includes("→") ? "#f59e0b" : "#a0f0a0",
                 opacity: i === activityLog.length - 1 ? 1 : 0.7,
               }}>
@@ -482,7 +482,7 @@ function DemoTab() {
             <div style={row(isDark)}><span style={label(isDark)}>Payer</span><span style={{ fontFamily: "ui-monospace", fontSize: 12 }}>{demoData.sampleEscrow?.payer?.slice(0, 12)}...</span></div>
             <div style={row(isDark)}><span style={label(isDark)}>Payee</span><span style={{ fontFamily: "ui-monospace", fontSize: 12 }}>{demoData.sampleEscrow?.payee?.slice(0, 12)}...</span></div>
             <div style={row(isDark)}><span style={label(isDark)}>Status</span><span style={{ color: "#f59e0b", fontWeight: 700 }}>FUNDED</span></div>
-            
+
             {demoData.howItWorks && (
               <div style={{ marginTop: 16, padding: 16, borderRadius: 12, background: isDark ? "rgba(255,255,255,0.03)" : "#f8f8f8" }}>
                 <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>How It Works:</div>
@@ -573,21 +573,21 @@ function DemoTab() {
       {/* Feature Highlights */}
       {step === 0 && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24 }}>
-          <FeatureHighlight 
+          <FeatureHighlight
             isDark={isDark}
-            icon="🤖" 
+            icon="🤖"
             title="Multi-Agent AI"
             desc="3 specialized agents (Compliance, Operations, Arbiter) analyze each escrow independently before reaching consensus"
           />
-          <FeatureHighlight 
+          <FeatureHighlight
             isDark={isDark}
-            icon="🧠" 
+            icon="🧠"
             title="MeshMind Assistant"
             desc="Intelligent knowledge assistant powered by AI - ask anything about escrows, policies, and platform features"
           />
-          <FeatureHighlight 
+          <FeatureHighlight
             isDark={isDark}
-            icon="⚡" 
+            icon="⚡"
             title="Autonomous Execution"
             desc="High-confidence AI decisions can be automatically executed on-chain without human intervention"
           />
@@ -684,32 +684,52 @@ function EscrowTab() {
   const insufficientBalance = useMemo(() => ((bal.data as bigint | undefined) || 0n) < amt, [bal.data, amt]);
 
   async function approve() {
-    const hash = await writeContractAsync({ abi: ERC20_ABI, address: MNEE_TOKEN, functionName: "approve", args: [ESCROW_ADDRESS, amt] });
-    setLastTxHash(hash);
+    try {
+      const hash = await writeContractAsync({
+        abi: ERC20_ABI,
+        address: MNEE_TOKEN,
+        functionName: "approve",
+        args: [ESCROW_ADDRESS, amt]
+      });
+      setLastTxHash(hash);
+      toast.success("Approval transaction sent!");
+    } catch (err: any) {
+      console.error("Approval error:", err);
+      const msg = err?.message || String(err);
+      if (!msg.includes("User rejected") && !msg.includes("user rejected")) {
+        toast.error(`Approval Failed: ${msg.slice(0, 100)}`);
+      }
+    }
   }
 
   async function createEscrow() {
     try {
-    const deadline = Math.floor(Date.now() / 1000) + (Number(deadlineMins || "0") * 60);
+      const deadline = Math.floor(Date.now() / 1000) + (Number(deadlineMins || "0") * 60);
       // Use zero hash for metadataHash (no off-chain metadata)
       const metadataHash = "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
       console.log("Creating escrow with:", { escrowId, payee, amt: amt.toString(), arbiter, deadline, metadataHash });
       const hash = await writeContractAsync({
-      abi: ESCROW_ABI,
-      address: ESCROW_ADDRESS,
-      functionName: "createEscrow",
+        abi: ESCROW_ABI,
+        address: ESCROW_ADDRESS,
+        functionName: "createEscrow",
         args: [escrowId as `0x${string}`, payee as `0x${string}`, amt, arbiter as `0x${string}`, BigInt(deadline), metadataHash],
-    });
+      });
       console.log("Escrow created, tx hash:", hash);
       setLastTxHash(hash);
-    setActiveEscrowId(escrowId);
+      setActiveEscrowId(escrowId);
+
+      // Force refetch escrow data
+      setTimeout(() => {
+        escrowView.refetch();
+      }, 1000);
+
       // Generate a new escrow key for next time
       setEscrowKey("order-" + Math.floor(Math.random() * 1e6));
-      
+
       // Success toast and sound
       toast.success(`Escrow Created! ID: ${escrowId.slice(0, 12)}...`);
       playChaChingSound();
-      
+
       // Link to negotiation if one is active
       // @ts-ignore
       if (window.negotiationSandbox?.negotiationId) {
@@ -741,7 +761,7 @@ function EscrowTab() {
       const targetId = (activeEscrowId || escrowId) as `0x${string}`;
       const hash = await writeContractAsync({ abi: ESCROW_ABI, address: ESCROW_ADDRESS, functionName: "release", args: [targetId] });
       setLastTxHash(hash);
-      
+
       // Trigger event rescan after a short delay for the tx to be mined
       setTimeout(async () => {
         try {
@@ -750,14 +770,14 @@ function EscrowTab() {
           escrowView.refetch();
         } catch (e) { /* ignore */ }
       }, 2000);
-      
+
       // Update linked negotiation status (if any)
       // @ts-ignore
       if (window.negotiationSandbox?.negotiationId) {
         // @ts-ignore
         window.negotiationSandbox.updateStatus('released', hash);
       }
-      
+
       toast.success(`Release Successful! Funds sent to payee. Tx: ${hash.slice(0, 12)}...`);
       playSuccess();
     } catch (err: any) {
@@ -774,7 +794,7 @@ function EscrowTab() {
       const targetId = (activeEscrowId || escrowId) as `0x${string}`;
       const hash = await writeContractAsync({ abi: ESCROW_ABI, address: ESCROW_ADDRESS, functionName: "refund", args: [targetId] });
       setLastTxHash(hash);
-      
+
       // Trigger event rescan after a short delay for the tx to be mined
       setTimeout(async () => {
         try {
@@ -783,14 +803,14 @@ function EscrowTab() {
           escrowView.refetch();
         } catch (e) { /* ignore */ }
       }, 2000);
-      
+
       // Update linked negotiation status (if any)
       // @ts-ignore
       if (window.negotiationSandbox?.negotiationId) {
         // @ts-ignore
         window.negotiationSandbox.updateStatus('refunded', hash);
       }
-      
+
       toast.success(`Refund Successful! Funds returned to payer. Tx: ${hash.slice(0, 12)}...`);
       playSuccess();
     } catch (err: any) {
@@ -807,12 +827,12 @@ function EscrowTab() {
     if (!d) return null;
     // Contract returns: payer, payee, arbiter, amount, releasedAmount, deadline, metadataHash, status, disputeActive
     return {
-      payer: d[0], 
-      payee: d[1], 
-      arbiter: d[2], 
-      amount: d[3], 
+      payer: d[0],
+      payee: d[1],
+      arbiter: d[2],
+      amount: d[3],
       releasedAmount: d[4],
-      deadline: Number(d[5]), 
+      deadline: Number(d[5]),
       metadataHash: d[6],
       status: Number(d[7]),
       disputeActive: d[8]
@@ -847,13 +867,78 @@ function EscrowTab() {
         {/* Wallet Card */}
         <div style={card(isDark)}>
           <h3 style={{ margin: "0 0 16px 0", fontSize: 16, fontWeight: 700 }}>💳 Wallet & Token</h3>
-          <div style={row(isDark)}><span style={label(isDark)}>Connected</span><span style={{ color: isConnected ? "#22c55e" : "#ef4444", fontWeight: 600 }}>{isConnected ? "Yes" : "No"}</span></div>
-          <div style={row(isDark)}><span style={label(isDark)}>Balance</span><span style={{ fontWeight: 700 }}>{isConnected ? `${parseFloat(balanceStr).toLocaleString()} ${TOKEN_NAME}` : "—"}</span></div>
-          <div style={row(isDark)}><span style={label(isDark)}>Allowance</span><span style={{ fontWeight: 600, color: needsApproval ? "#f59e0b" : "#22c55e" }}>{isConnected ? `${parseFloat(allowanceStr).toLocaleString()} ${TOKEN_NAME}` : "—"}</span></div>
-          {insufficientBalance && amt > 0n && <div style={{ marginTop: 12, padding: 10, borderRadius: 8, background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", fontSize: 13, color: "#ef4444" }}>⚠️ Insufficient balance</div>}
-          <button style={needsApproval ? primaryBtn(isDark) : { ...secondaryBtn(isDark), opacity: 0.5, marginTop: 16 }} disabled={!isConnected || isPending || !needsApproval || amt === 0n} onClick={approve}>
-            {isPending ? "Approving..." : needsApproval ? `Approve ${amount} ${TOKEN_NAME}` : "✓ Approved"}
-            </button>
+          {!isConnected ? (
+            <div style={{ textAlign: "center", padding: "10px 0" }}>
+              <p style={{ fontSize: 13, color: isDark ? "#888" : "#666", marginBottom: 16 }}>
+                Connect your wallet to manage escrows
+              </p>
+              <WalletConnect variant="primary" />
+            </div>
+          ) : (
+            <>
+              <div style={row(isDark)}>
+                <span style={label(isDark)}>Connected</span>
+                <span style={{ color: "#22c55e", fontWeight: 600 }}>Yes ({shortAddr(address || "")})</span>
+              </div>
+              <div style={row(isDark)}>
+                <span style={label(isDark)}>Balance</span>
+                <span style={{ fontWeight: 700 }}>{parseFloat(balanceStr).toLocaleString()} {TOKEN_NAME}</span>
+              </div>
+              <div style={row(isDark)}>
+                <span style={label(isDark)}>Allowance</span>
+                <span style={{ fontWeight: 600, color: needsApproval ? "#f59e0b" : "#22c55e" }}>
+                  {parseFloat(allowanceStr).toLocaleString()} {TOKEN_NAME}
+                </span>
+              </div>
+              {insufficientBalance && amt > 0n && (
+                <div style={{
+                  marginTop: 12,
+                  padding: 10,
+                  borderRadius: 8,
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  fontSize: 13,
+                  color: "#ef4444"
+                }}>
+                  ⚠️ Insufficient balance! Get MNEE tokens from the faucet or mint some below.
+                </div>
+              )}
+              {/* DEBUG INFO - REMOVE AFTER FIX */}
+              <div style={{ marginTop: 12, padding: 8, borderRadius: 6, background: "rgba(0,0,0,0.1)", fontSize: 10, fontFamily: "monospace" }}>
+                Token: {MNEE_TOKEN.slice(0, 10)}... | Escrow: {ESCROW_ADDRESS.slice(0, 10)}...
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+                <button
+                  style={needsApproval ? primaryBtn(isDark) : { ...secondaryBtn(isDark), opacity: 0.5, flex: 1 }}
+                  disabled={isPending || !needsApproval || amt === 0n || insufficientBalance}
+                  onClick={approve}
+                >
+                  {isPending ? "Approving..." : needsApproval ? `Approve ${amount} ${TOKEN_NAME}` : "✓ Approved"}
+                </button>
+                {IS_LOCAL && (
+                  <button
+                    style={{ ...secondaryBtn(isDark), flex: 1 }}
+                    onClick={async () => {
+                      try {
+                        const hash = await writeContractAsync({
+                          abi: ERC20_ABI,
+                          address: MNEE_TOKEN,
+                          functionName: "mint",
+                          args: [address as `0x${string}`, parseUnits("1000", 18)]
+                        });
+                        toast.success("Minting 1000 MNEE...");
+                        setLastTxHash(hash);
+                      } catch (e: any) {
+                        toast.error("Mint failed: " + (e.message || "Unknown error"));
+                      }
+                    }}
+                  >
+                    🎁 Mint 1000 MNEE
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Create Escrow Card */}
@@ -873,13 +958,13 @@ function EscrowTab() {
             {/* Show hints only when something is missing */}
             {!isConnected || needsApproval || amt === 0n || !payee || !arbiter || insufficientBalance ? (
               <div style={{ fontSize: 11, color: "#f59e0b", marginTop: 8 }}>
-                {!isConnected ? "⚠️ Connect wallet" : 
-                 needsApproval ? "⚠️ Click Approve first" : 
-                 amt === 0n ? "⚠️ Enter amount" : 
-                 !payee ? "⚠️ Enter payee address" : 
-                 !arbiter ? "⚠️ Enter arbiter address" : 
-                 insufficientBalance ? "⚠️ Insufficient balance" : ""}
-          </div>
+                {!isConnected ? "⚠️ Connect wallet" :
+                  needsApproval ? "⚠️ Click Approve first" :
+                    amt === 0n ? "⚠️ Enter amount" :
+                      !payee ? "⚠️ Enter payee address" :
+                        !arbiter ? "⚠️ Enter arbiter address" :
+                          insufficientBalance ? "⚠️ Insufficient balance" : ""}
+              </div>
             ) : (
               <div style={{ fontSize: 11, color: "#22c55e", marginTop: 8 }}>✓ Ready to create escrow</div>
             )}
@@ -901,26 +986,26 @@ function EscrowTab() {
               <div style={row(isDark)}><span style={label(isDark)}>Status</span><span style={{ fontWeight: 700, color: STATUS_COLORS[escrowState.status], padding: "4px 10px", borderRadius: 8, background: `${STATUS_COLORS[escrowState.status]}20` }}>{STATUS[escrowState.status]}</span></div>
               <div style={row(isDark)}><span style={label(isDark)}>Arbiter</span><span style={{ fontFamily: "ui-monospace", fontSize: 11 }}>{escrowState.arbiter?.slice(0, 10)}...{escrowState.arbiter?.slice(-6)}</span></div>
               <div style={row(isDark)}><span style={label(isDark)}>Deadline</span><span>{new Date(escrowState.deadline * 1000).toLocaleString()}</span></div>
-              
+
               {/* Show buttons only for Funded status */}
               {escrowState.status === 1 ? (
                 <>
                   {/* Warning if not arbiter */}
                   {address && escrowState.arbiter && address.toLowerCase() !== escrowState.arbiter.toLowerCase() && (
-                    <div style={{ 
-                      marginTop: 12, 
-                      padding: 10, 
-                      borderRadius: 8, 
-                      background: "rgba(245, 158, 11, 0.1)", 
+                    <div style={{
+                      marginTop: 12,
+                      padding: 10,
+                      borderRadius: 8,
+                      background: "rgba(245, 158, 11, 0.1)",
                       border: "1px solid rgba(245, 158, 11, 0.3)",
                       fontSize: 12
                     }}>
                       <div style={{ fontWeight: 600, color: "#f59e0b", marginBottom: 4 }}>⚠️ Not Arbiter</div>
                       <div style={{ color: isDark ? "#888" : "#666" }}>
-                        Only the arbiter ({escrowState.arbiter.slice(0, 8)}...) can release funds. 
+                        Only the arbiter ({escrowState.arbiter.slice(0, 8)}...) can release funds.
                         Switch wallet or wait for arbiter to act.
-          </div>
-          </div>
+                      </div>
+                    </div>
                   )}
                   <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
                     <button style={primaryBtn(isDark)} disabled={!isConnected || isPending} onClick={release}>🔓 Release Funds</button>
@@ -928,10 +1013,10 @@ function EscrowTab() {
                   </div>
                 </>
               ) : (
-                <div style={{ 
-                  marginTop: 16, 
-                  padding: 12, 
-                  borderRadius: 8, 
+                <div style={{
+                  marginTop: 16,
+                  padding: 12,
+                  borderRadius: 8,
                   background: escrowState.status === 2 ? "rgba(34, 197, 94, 0.1)" : "rgba(239, 68, 68, 0.1)",
                   border: `1px solid ${escrowState.status === 2 ? "rgba(34, 197, 94, 0.3)" : "rgba(239, 68, 68, 0.3)"}`,
                   textAlign: "center"
@@ -1039,30 +1124,30 @@ function EscrowTab() {
         {escrowState && escrowState.status !== 0 && (
           <div style={card(isDark)}>
             <h3 style={{ margin: "0 0 16px 0", fontSize: 16, fontWeight: 700 }}>💰 Balance Tracker</h3>
-            
+
             {/* Before/After Table */}
-            <div style={{ 
-              display: "grid", 
-              gridTemplateColumns: "1fr 1fr", 
-              gap: 12, 
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
               marginBottom: 16
             }}>
               {/* Payer Card */}
-              <div style={{ 
-                padding: 14, 
-                borderRadius: 10, 
+              <div style={{
+                padding: 14,
+                borderRadius: 10,
                 background: isDark ? "rgba(59, 130, 246, 0.08)" : "rgba(59, 130, 246, 0.05)",
                 border: `1px solid ${isDark ? "rgba(59, 130, 246, 0.2)" : "rgba(59, 130, 246, 0.15)"}`
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                   <span style={{ fontSize: 16 }}>👤</span>
-            <div>
+                  <div>
                     <div style={{ fontSize: 12, fontWeight: 600, color: "#3b82f6" }}>PAYER</div>
                     <div style={{ fontFamily: "ui-monospace", fontSize: 10, color: isDark ? "#666" : "#888" }}>
                       {escrowState.payer?.slice(0, 8)}...{escrowState.payer?.slice(-4)}
                     </div>
                   </div>
-            </div>
+                </div>
 
                 {/* Before */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
@@ -1071,14 +1156,14 @@ function EscrowTab() {
                     {(parseFloat(payerBalanceStr) + parseFloat(formatUnits(escrowState.amount, 18))).toLocaleString(undefined, { maximumFractionDigits: 0 })} MNEE
                   </span>
                 </div>
-                
+
                 {/* Change */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
                   <span style={{ fontSize: 11, color: isDark ? "#666" : "#888" }}>Change</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: "#ef4444" }}>
                     −{formatUnits(escrowState.amount, 18)} MNEE
                   </span>
-          </div>
+                </div>
 
                 {/* Current */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
@@ -1087,12 +1172,12 @@ function EscrowTab() {
                     {parseFloat(payerBalanceStr).toLocaleString(undefined, { maximumFractionDigits: 0 })} MNEE
                   </span>
                 </div>
-          </div>
+              </div>
 
               {/* Payee Card */}
-              <div style={{ 
-                padding: 14, 
-                borderRadius: 10, 
+              <div style={{
+                padding: 14,
+                borderRadius: 10,
                 background: isDark ? "rgba(34, 197, 94, 0.08)" : "rgba(34, 197, 94, 0.05)",
                 border: `1px solid ${isDark ? "rgba(34, 197, 94, 0.2)" : "rgba(34, 197, 94, 0.15)"}`
               }}>
@@ -1102,21 +1187,21 @@ function EscrowTab() {
                     <div style={{ fontSize: 12, fontWeight: 600, color: "#22c55e" }}>PAYEE</div>
                     <div style={{ fontFamily: "ui-monospace", fontSize: 10, color: isDark ? "#666" : "#888" }}>
                       {escrowState.payee?.slice(0, 8)}...{escrowState.payee?.slice(-4)}
-          </div>
-        </div>
-      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Before */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
                   <span style={{ fontSize: 11, color: isDark ? "#666" : "#888" }}>Before Release</span>
                   <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? "#aaa" : "#555" }}>
-                    {escrowState.status === 2 
+                    {escrowState.status === 2
                       ? (parseFloat(payeeBalanceStr) - parseFloat(formatUnits(escrowState.amount, 18))).toLocaleString(undefined, { maximumFractionDigits: 0 })
                       : parseFloat(payeeBalanceStr).toLocaleString(undefined, { maximumFractionDigits: 0 })
                     } MNEE
                   </span>
                 </div>
-                
+
                 {/* Change */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
                   <span style={{ fontSize: 11, color: isDark ? "#666" : "#888" }}>
@@ -1126,31 +1211,31 @@ function EscrowTab() {
                     {escrowState.status === 2 ? "+" : escrowState.status === 1 ? "⏳ " : ""}{formatUnits(escrowState.amount, 18)} MNEE
                   </span>
                 </div>
-                
+
                 {/* Current */}
                 <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
                   <span style={{ fontSize: 11, color: isDark ? "#666" : "#888" }}>Current</span>
                   <span style={{ fontSize: 14, fontWeight: 700, color: "#22c55e" }}>
                     {parseFloat(payeeBalanceStr).toLocaleString(undefined, { maximumFractionDigits: 0 })} MNEE
                   </span>
-              </div>
+                </div>
               </div>
             </div>
 
             {/* Visual Flow */}
-            <div style={{ 
-              display: "flex", 
-              alignItems: "center", 
-              justifyContent: "center", 
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 8,
               padding: 12,
               borderRadius: 8,
               background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
               marginBottom: 12
             }}>
-              <div style={{ 
-                padding: "6px 12px", 
-                borderRadius: 6, 
+              <div style={{
+                padding: "6px 12px",
+                borderRadius: 6,
                 background: "rgba(59, 130, 246, 0.1)",
                 fontSize: 11,
                 fontWeight: 600,
@@ -1159,9 +1244,9 @@ function EscrowTab() {
                 Payer
               </div>
               <div style={{ color: isDark ? "#444" : "#ccc" }}>→</div>
-              <div style={{ 
-                padding: "6px 12px", 
-                borderRadius: 6, 
+              <div style={{
+                padding: "6px 12px",
+                borderRadius: 6,
                 background: escrowState.status === 1 ? "rgba(245, 158, 11, 0.1)" : "rgba(34, 197, 94, 0.1)",
                 fontSize: 11,
                 fontWeight: 700,
@@ -1170,9 +1255,9 @@ function EscrowTab() {
                 {escrowState.status === 1 ? "🔒" : "✅"} {formatUnits(escrowState.amount, 18)} MNEE
               </div>
               <div style={{ color: isDark ? "#444" : "#ccc" }}>→</div>
-              <div style={{ 
-                padding: "6px 12px", 
-                borderRadius: 6, 
+              <div style={{
+                padding: "6px 12px",
+                borderRadius: 6,
                 background: "rgba(34, 197, 94, 0.1)",
                 fontSize: 11,
                 fontWeight: 600,
@@ -1183,9 +1268,9 @@ function EscrowTab() {
             </div>
 
             {/* Status */}
-            <div style={{ 
-              padding: 10, 
-              borderRadius: 8, 
+            <div style={{
+              padding: 10,
+              borderRadius: 8,
               background: escrowState.status === 2 ? "rgba(34, 197, 94, 0.1)" : escrowState.status === 1 ? "rgba(245, 158, 11, 0.1)" : "rgba(239, 68, 68, 0.1)",
               fontSize: 12,
               textAlign: "center",
@@ -1198,8 +1283,8 @@ function EscrowTab() {
             </div>
 
             {/* Refresh Button */}
-            <button 
-              onClick={async () => { 
+            <button
+              onClick={async () => {
                 setIsRefreshing(true);
                 try {
                   await Promise.all([
@@ -1213,10 +1298,10 @@ function EscrowTab() {
                 }
               }}
               disabled={isRefreshing}
-              style={{ 
-                ...secondaryBtn(isDark), 
-                marginTop: 12, 
-                width: "100%", 
+              style={{
+                ...secondaryBtn(isDark),
+                marginTop: 12,
+                width: "100%",
                 fontSize: 12,
                 padding: "8px 12px",
                 opacity: isRefreshing ? 0.7 : 1,
@@ -1285,8 +1370,8 @@ function AgentTab() {
         <div style={{ marginTop: 20, padding: 16, borderRadius: 12, background: isDark ? "rgba(102, 126, 234, 0.1)" : "rgba(99, 102, 241, 0.05)", border: `1px solid ${isDark ? "rgba(102, 126, 234, 0.3)" : "rgba(99, 102, 241, 0.2)"}` }}>
           <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 8 }}>🧠 Multi-Agent System</div>
           <div style={{ fontSize: 12, color: isDark ? "#a0a0b0" : "#666", lineHeight: 1.6 }}>
-            <strong>Compliance Agent:</strong> Evaluates risk score, flags high-value/urgent escrows<br/>
-            <strong>Operations Agent:</strong> Optimizes for customer satisfaction & deadlines<br/>
+            <strong>Compliance Agent:</strong> Evaluates risk score, flags high-value/urgent escrows<br />
+            <strong>Operations Agent:</strong> Optimizes for customer satisfaction & deadlines<br />
             <strong>Arbiter Agent:</strong> Combines inputs, produces final recommendation
           </div>
         </div>
@@ -1317,10 +1402,10 @@ function AgentTab() {
                     fontSize: 12,
                     fontWeight: 700,
                     background: d.recommendation === 'RELEASE' ? "rgba(34, 197, 94, 0.15)" :
-                                d.recommendation === 'REFUND' ? "rgba(239, 68, 68, 0.15)" :
-                                "rgba(245, 158, 11, 0.15)",
+                      d.recommendation === 'REFUND' ? "rgba(239, 68, 68, 0.15)" :
+                        "rgba(245, 158, 11, 0.15)",
                     color: d.recommendation === 'RELEASE' ? "#22c55e" :
-                           d.recommendation === 'REFUND' ? "#ef4444" : "#f59e0b"
+                      d.recommendation === 'REFUND' ? "#ef4444" : "#f59e0b"
                   }}>
                     {d.recommendation}
                   </span>
@@ -1353,7 +1438,7 @@ function CopilotTab() {
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [aiProvider, setAiProvider] = useState<string>("");
-  const [conversationHistory, setConversationHistory] = useState<{q: string, a: string, provider: string}[]>([]);
+  const [conversationHistory, setConversationHistory] = useState<{ q: string, a: string, provider: string }[]>([]);
 
   async function loadSuggestions() {
     try {
@@ -1361,7 +1446,7 @@ function CopilotTab() {
       const data = await res.json();
       setSuggestions(data.suggestions || []);
       setAiProvider(data.provider || 'Knowledge Base');
-    } catch (e) {}
+    } catch (e) { }
   }
 
   async function submitQuery(q?: string) {
@@ -1378,8 +1463,8 @@ function CopilotTab() {
       const data = await res.json();
       setResponse(data);
       // Add to conversation history
-      setConversationHistory(prev => [...prev, { 
-        q: queryText, 
+      setConversationHistory(prev => [...prev, {
+        q: queryText,
         a: data.answer || data.error || "No response",
         provider: data.provider || 'Unknown'
       }]);
@@ -1396,7 +1481,7 @@ function CopilotTab() {
       {/* MeshMind Header */}
       <div style={{
         ...card(isDark),
-        background: isDark 
+        background: isDark
           ? "linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%)"
           : "linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%)",
         textAlign: "center",
@@ -1409,10 +1494,10 @@ function CopilotTab() {
         <p style={{ fontSize: 14, color: isDark ? "#a0a0b0" : "#666", margin: 0 }}>
           Your intelligent AutoTrust knowledge assistant
         </p>
-        <div style={{ 
-          display: "inline-flex", 
-          alignItems: "center", 
-          gap: 6, 
+        <div style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
           marginTop: 12,
           padding: "4px 12px",
           borderRadius: 20,
@@ -1423,16 +1508,16 @@ function CopilotTab() {
         }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e" }}></span>
           Powered by {aiProvider}
-          </div>
         </div>
+      </div>
 
       {/* Chat Interface */}
       <div style={card(isDark)}>
         {/* Conversation History */}
         {conversationHistory.length > 0 && (
-          <div style={{ 
-            maxHeight: 400, 
-            overflowY: "auto", 
+          <div style={{
+            maxHeight: 400,
+            overflowY: "auto",
             marginBottom: 20,
             padding: 16,
             borderRadius: 12,
@@ -1451,7 +1536,7 @@ function CopilotTab() {
                     fontSize: 13
                   }}>
                     {item.q}
-      </div>
+                  </div>
                 </div>
                 {/* MeshMind Response */}
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
@@ -1506,13 +1591,13 @@ function CopilotTab() {
               fontSize: 14
             }}
           />
-          <button 
+          <button
             style={{
               ...primaryBtn(isDark),
               borderRadius: 24,
               padding: "14px 24px"
-            }} 
-            onClick={() => submitQuery()} 
+            }}
+            onClick={() => submitQuery()}
             disabled={loading || !query}
           >
             {loading ? "🤔" : "Ask →"}
@@ -1614,7 +1699,7 @@ function AdvancedTab() {
                   padding: "8px 16px",
                   borderRadius: 8,
                   border: "none",
-                  background: activeSection === section.id 
+                  background: activeSection === section.id
                     ? (isDark ? "#667eea" : "#6366f1")
                     : "transparent",
                   color: activeSection === section.id ? "#fff" : (isDark ? "#888" : "#666"),
@@ -1696,7 +1781,7 @@ function OpsLog({ isDark, onSelectEscrow }: { isDark: boolean; onSelectEscrow?: 
   const events = data?.events || [];
   return (
     <div style={{ maxHeight: 250, overflow: "auto" }}>
-        {events.length === 0 ? (
+      {events.length === 0 ? (
         <div style={{ padding: 16, textAlign: "center", color: isDark ? "#666" : "#999", fontSize: 13 }}>No events yet</div>
       ) : (
         events.slice(0, 10).map((e: any, i: number) => (
@@ -1715,7 +1800,7 @@ function OpsLog({ isDark, onSelectEscrow }: { isDark: boolean; onSelectEscrow?: 
               <span style={{ fontSize: 10, color: isDark ? "#666" : "#999" }}>
                 {e.amount ? `${(Number(e.amount) / 1e18).toFixed(0)} MNEE` : ""}
               </span>
-      </div>
+            </div>
             <div style={{ display: "flex", gap: 6 }}>
               {/* Main button - Load Escrow */}
               <button
