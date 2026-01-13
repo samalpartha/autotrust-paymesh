@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchGasPrices, formatGasPrice, getCongestionColor, getSimpleGasPrice, type GasPrices, type SimpleGasPrice } from '../lib/gas';
 import { IS_LOCAL } from '../lib/contracts';
+import { RPC_URL } from '../lib/config';
 
 interface GasIndicatorProps {
   showDetails?: boolean;
@@ -18,21 +19,21 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      
+
       if (IS_LOCAL) {
         // For local network, just get simple gas price
-        const price = await getSimpleGasPrice("http://127.0.0.1:8545");
+        const price = await getSimpleGasPrice(RPC_URL);
         setSimpleGas(price);
       } else {
         // For mainnet, get full gas prices from Infura Gas API
         const prices = await fetchGasPrices();
         setGasPrices(prices);
-        
+
         // Also get simple gas as fallback
         const simple = await getSimpleGasPrice();
         setSimpleGas(simple);
       }
-      
+
       setLoading(false);
     };
 
@@ -58,8 +59,8 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 14 }}>⛽</span>
           <span style={{ fontSize: 12, color: IS_LOCAL ? '#888' : '#666' }}>Gas Price</span>
-          <span style={{ 
-            fontWeight: 600, 
+          <span style={{
+            fontWeight: 600,
             fontFamily: 'ui-monospace, monospace',
             fontSize: 13,
             color: simpleGas ? getCongestionColor(parseFloat(simpleGas) < 20 ? 'low' : parseFloat(simpleGas) < 50 ? 'medium' : 'high') : '#888'
@@ -78,17 +79,17 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 14 }}>⛽</span>
           <span style={{ fontSize: 12, color: '#888' }}>Gas</span>
-          <span style={{ 
-            fontWeight: 600, 
+          <span style={{
+            fontWeight: 600,
             fontFamily: 'ui-monospace, monospace',
             fontSize: 13,
             color: getCongestionColor(formattedGas.congestion)
           }}>
             {formattedGas.gasPrice} Gwei
           </span>
-          <span style={{ 
-            fontSize: 10, 
-            padding: '2px 6px', 
+          <span style={{
+            fontSize: 10,
+            padding: '2px 6px',
             borderRadius: 4,
             background: `${getCongestionColor(formattedGas.congestion)}20`,
             color: getCongestionColor(formattedGas.congestion)
@@ -105,16 +106,16 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
     <div style={{ ...detailedContainerStyle(IS_LOCAL), ...style }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <span style={{ fontWeight: 600, fontSize: 14 }}>⛽ Gas Prices</span>
-        <span style={{ 
-          fontSize: 11, 
-          padding: '3px 8px', 
+        <span style={{
+          fontSize: 11,
+          padding: '3px 8px',
           borderRadius: 6,
           background: `${getCongestionColor(formattedGas.congestion)}15`,
           color: getCongestionColor(formattedGas.congestion),
           fontWeight: 500
         }}>
-          {formattedGas.congestion === 'low' ? '🟢 Low Traffic' : 
-           formattedGas.congestion === 'medium' ? '🟡 Normal' : '🔴 Congested'}
+          {formattedGas.congestion === 'low' ? '🟢 Low Traffic' :
+            formattedGas.congestion === 'medium' ? '🟡 Normal' : '🔴 Congested'}
         </span>
       </div>
 
@@ -129,12 +130,12 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
               style={{
                 flex: 1,
                 padding: '10px 8px',
-                border: isSelected 
-                  ? `2px solid ${getCongestionColor(tier.congestion)}` 
+                border: isSelected
+                  ? `2px solid ${getCongestionColor(tier.congestion)}`
                   : '1px solid rgba(255,255,255,0.1)',
                 borderRadius: 10,
-                background: isSelected 
-                  ? `${getCongestionColor(tier.congestion)}15` 
+                background: isSelected
+                  ? `${getCongestionColor(tier.congestion)}15`
                   : 'rgba(255,255,255,0.03)',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
@@ -143,9 +144,9 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
               <div style={{ fontSize: 10, color: '#888', marginBottom: 4, textTransform: 'capitalize' }}>
                 {speed === 'low' ? '🐢 Slow' : speed === 'medium' ? '🚗 Normal' : '🚀 Fast'}
               </div>
-              <div style={{ 
-                fontWeight: 700, 
-                fontSize: 16, 
+              <div style={{
+                fontWeight: 700,
+                fontSize: 16,
                 fontFamily: 'ui-monospace, monospace',
                 color: isSelected ? getCongestionColor(tier.congestion) : '#e0e0e0'
               }}>
@@ -160,10 +161,10 @@ export function GasIndicator({ showDetails = false, style }: GasIndicatorProps) 
         })}
       </div>
 
-      <div style={{ 
-        marginTop: 12, 
-        padding: '8px 12px', 
-        background: 'rgba(102, 126, 234, 0.1)', 
+      <div style={{
+        marginTop: 12,
+        padding: '8px 12px',
+        background: 'rgba(102, 126, 234, 0.1)',
         borderRadius: 8,
         fontSize: 11,
         color: '#888'

@@ -1817,10 +1817,10 @@ app.get('/arbitration/:escrowId/evidence', (req, res) => {
 app.post('/arbitration/:escrowId/analyze', async (req, res) => {
   try {
     const { escrowId } = req.params;
-    const evidence = disputeEvidence.get(escrowId);
+    let evidence = disputeEvidence.get(escrowId);
 
     if (!evidence) {
-      return res.status(404).json({ error: 'No evidence found for this escrow' });
+      evidence = { claimant: [], respondent: [], aiAnalysis: null, status: 'pending' };
     }
 
     // Get escrow data

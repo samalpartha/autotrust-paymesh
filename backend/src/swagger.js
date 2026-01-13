@@ -44,8 +44,8 @@ No rate limits in development mode.
   },
   servers: [
     {
-      url: 'http://localhost:8787',
-      description: 'Local Development Server'
+      url: 'https://autotrust-backend-108816008638.us-central1.run.app',
+      description: 'Cloud Production Server'
     }
   ],
   tags: [

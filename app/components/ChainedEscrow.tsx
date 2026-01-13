@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../lib/config';
 import { TrustBadge, getTierFromScore } from './AgentReputation';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8787';
+
 
 interface EscrowNode {
   id: string;
@@ -81,7 +82,7 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ parentId, childId, dependencyType: 'release' })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
@@ -102,10 +103,10 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
       setLinkStatus('⚠️ Enter both parent and child escrow IDs');
       return;
     }
-    
+
     setLinkStatus('Linking escrows...');
     const linked = await linkEscrowsOnBackend(newParentId, newChildId);
-    
+
     if (linked) {
       // Add to local chain display
       const newNode: EscrowNode = {
@@ -116,7 +117,7 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
         status: 'pending',
         dependsOn: newParentId.slice(0, 10) + '...',
       };
-      
+
       // Check if parent exists in chain
       const parentExists = chain.some(n => n.id.startsWith(newParentId.slice(0, 10)));
       if (!parentExists) {
@@ -130,7 +131,7 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
       } else {
         setChain(prev => [...prev, newNode]);
       }
-      
+
       setNewParentId('');
       setNewChildId('');
       setIsLive(true);
@@ -202,10 +203,10 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
             <div style={{ fontSize: 32, marginBottom: 12 }}>🔗</div>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>No Chained Escrows Yet</div>
             <div style={{ fontSize: 12, lineHeight: 1.6 }}>
-              <strong>To create a chain:</strong><br/>
-              1. First create escrows via the "Escrow" tab<br/>
-              2. Copy escrow IDs from the operations log<br/>
-              3. Link them below (parent → child dependency)<br/>
+              <strong>To create a chain:</strong><br />
+              1. First create escrows via the "Escrow" tab<br />
+              2. Copy escrow IDs from the operations log<br />
+              3. Link them below (parent → child dependency)<br />
               <span style={{ fontSize: 11, color: isDark ? '#555' : '#94a3b8' }}>
                 Child funds release only when parent completes.
               </span>
@@ -240,11 +241,11 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Node */}
-                <EscrowNodeCard 
-                  node={node} 
-                  isDark={isDark} 
+                <EscrowNodeCard
+                  node={node}
+                  isDark={isDark}
                   isSelected={selectedNode === node.id}
                   onClick={() => setSelectedNode(selectedNode === node.id ? null : node.id)}
                   indentLevel={node.dependsOn ? 1 : 0}
@@ -274,11 +275,11 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
         </div>
 
         {linkStatus && (
-          <div style={{ 
-            marginTop: 12, 
-            textAlign: 'center', 
-            fontSize: 11, 
-            color: linkStatus.startsWith('✅') ? '#22c55e' : '#f59e0b' 
+          <div style={{
+            marginTop: 12,
+            textAlign: 'center',
+            fontSize: 11,
+            color: linkStatus.startsWith('✅') ? '#22c55e' : '#f59e0b'
           }}>
             {linkStatus}
           </div>
@@ -295,7 +296,7 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
           ⚡ HOW IT WORKS
         </div>
         <div style={{ fontSize: 12, lineHeight: 1.6, color: isDark ? '#a0a0b0' : '#4b5563' }}>
-          1. Client locks 500 MNEE for full project → 2. LeadDevAI receives partial, subcontracts → 
+          1. Client locks 500 MNEE for full project → 2. LeadDevAI receives partial, subcontracts →
           3. FrontendBot & DataCrunch work in parallel → 4. Completion triggers cascading releases
         </div>
       </div>
@@ -384,29 +385,29 @@ export function ChainedEscrow({ isDark = true }: { isDark?: boolean }) {
   );
 }
 
-function EscrowNodeCard({ 
-  node, 
-  isDark, 
-  isSelected, 
+function EscrowNodeCard({
+  node,
+  isDark,
+  isSelected,
   onClick,
   indentLevel = 0,
-}: { 
-  node: EscrowNode; 
-  isDark: boolean; 
-  isSelected: boolean; 
+}: {
+  node: EscrowNode;
+  isDark: boolean;
+  isSelected: boolean;
   onClick: () => void;
   indentLevel?: number;
 }) {
   const config = STATUS_CONFIG[node.status];
-  
+
   return (
-    <div 
+    <div
       onClick={onClick}
       style={{
         marginLeft: indentLevel * 40,
         padding: 16,
         borderRadius: 16,
-        background: isSelected 
+        background: isSelected
           ? (isDark ? 'rgba(102, 126, 234, 0.15)' : 'rgba(99, 102, 241, 0.1)')
           : (isDark ? 'rgba(255,255,255,0.03)' : '#f9fafb'),
         border: `2px solid ${isSelected ? '#667eea' : (isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb')}`,

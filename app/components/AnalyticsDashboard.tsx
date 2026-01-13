@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../lib/config';
 
 interface ProtocolMetrics {
   tvl: string;
@@ -23,7 +24,7 @@ interface RecentActivity {
   timeAgo: string;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8787';
+
 
 export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
   const [metrics, setMetrics] = useState<ProtocolMetrics | null>(null);
@@ -40,7 +41,7 @@ export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
       const res = await fetch(`${BACKEND_URL}/analytics`);
       if (!res.ok) throw new Error('Failed to fetch analytics');
       const data = await res.json();
-      
+
       if (data.success) {
         setMetrics(data.metrics);
         setActivity(data.recentActivity || []);
@@ -78,10 +79,10 @@ export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
   // Animate numbers when metrics change
   useEffect(() => {
     if (!metrics) return;
-    
+
     const tvlNum = parseFloat(metrics.tvl) || 0;
     const volNum = parseFloat(metrics.totalVolume) || 0;
-    
+
     const duration = 1000;
     const steps = 30;
     const tvlStep = tvlNum / steps;
@@ -130,7 +131,7 @@ export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
       <div style={{
         padding: '16px 20px',
         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}`,
-        background: isDark 
+        background: isDark
           ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))'
           : 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))',
       }}>
@@ -179,9 +180,9 @@ export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
             <div style={{ fontSize: 24, marginBottom: 8 }}>📊</div>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#f59e0b', marginBottom: 8 }}>No Protocol Activity Yet</div>
             <div style={{ fontSize: 12, color: isDark ? '#a0a0b0' : '#64748b', lineHeight: 1.6 }}>
-              <strong>To see real metrics:</strong><br/>
-              1. Go to "Demo" tab → Load Sample Escrow<br/>
-              2. Or create real escrows via the "Escrow" tab<br/>
+              <strong>To see real metrics:</strong><br />
+              1. Go to "Demo" tab → Load Sample Escrow<br />
+              2. Or create real escrows via the "Escrow" tab<br />
               3. Register agents in "Advanced" → Agent Reputation
             </div>
           </div>
@@ -189,16 +190,16 @@ export function AnalyticsDashboard({ isDark = true }: { isDark?: boolean }) {
 
         {/* Hero Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 20 }}>
-          <HeroMetric 
-            label="Total Value Locked" 
+          <HeroMetric
+            label="Total Value Locked"
             value={formatNumber(animatedTVL)}
             subValue="MNEE"
             change={metrics?.activeEscrows ? `${metrics.activeEscrows} active` : 'No active escrows'}
             positive={!!metrics?.activeEscrows}
             isDark={isDark}
           />
-          <HeroMetric 
-            label="Total Volume (All Time)" 
+          <HeroMetric
+            label="Total Volume (All Time)"
             value={formatNumber(animatedVolume)}
             subValue="MNEE"
             change={metrics ? (metrics.totalAgents ? `${metrics.totalAgents} addresses` : 'No transactions yet') : ''}
@@ -309,26 +310,26 @@ function getActivityIcon(type: string): string {
   }
 }
 
-function HeroMetric({ 
-  label, 
-  value, 
-  subValue, 
-  change, 
-  positive, 
-  isDark 
-}: { 
-  label: string; 
-  value: string; 
-  subValue: string; 
-  change: string; 
-  positive: boolean; 
+function HeroMetric({
+  label,
+  value,
+  subValue,
+  change,
+  positive,
+  isDark
+}: {
+  label: string;
+  value: string;
+  subValue: string;
+  change: string;
+  positive: boolean;
   isDark: boolean;
 }) {
   return (
     <div style={{
       padding: 20,
       borderRadius: 16,
-      background: isDark 
+      background: isDark
         ? 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))'
         : 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}`,

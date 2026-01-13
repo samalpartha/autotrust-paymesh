@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { BACKEND_URL } from '../lib/config';
 
 interface Stream {
   id: string;
@@ -17,7 +18,7 @@ interface Stream {
   progress?: number;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8787';
+
 
 export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
   const [stream, setStream] = useState<Stream | null>(null);
@@ -28,13 +29,13 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
   const [walletBalance, setWalletBalance] = useState<number | null>(null); // null = loading from backend
   const [receiverBalance, setReceiverBalance] = useState<number>(0);
   const [walletHistory, setWalletHistory] = useState<string[]>([]);
-  
+
   // Config form
   const [sender, setSender] = useState('0x742d...8aB12');
   const [receiver, setReceiver] = useState('0x8ba1...DBA72');
   const [ratePerSecond, setRatePerSecond] = useState('0.05');
   const [totalBudget, setTotalBudget] = useState('100');
-  
+
   // Fetch wallet balance from backend (SINGLE SOURCE OF TRUTH)
   const fetchWalletBalance = async (): Promise<number> => {
     try {
@@ -50,7 +51,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
     }
     return walletBalance || 100;
   };
-  
+
   // Animation
   const [streamedAmount, setStreamedAmount] = useState(0);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -62,18 +63,18 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
   const startStream = async () => {
     setError(null);
     setSuccess(null);
-    
+
     // Get current balance from backend FIRST
     const currentBalance = await fetchWalletBalance();
     const budgetToUse = parseFloat(totalBudget);
-    
+
     if (currentBalance < budgetToUse) {
       setError(`Insufficient balance: ${currentBalance.toFixed(2)} MNEE (need ${budgetToUse})`);
       return;
     }
-    
+
     console.log(`[StartStream] Backend balance: ${currentBalance}, locking: ${budgetToUse}`);
-    
+
     try {
       const res = await fetch(`${BACKEND_URL}/streams/create`, {
         method: 'POST',
@@ -89,12 +90,12 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
 
       const data = await res.json();
       console.log(`[StartStream] Response:`, data);
-      
+
       if (!res.ok || data.error) {
         setError(data.error || 'Failed to create stream');
         return;
       }
-      
+
       if (data.success) {
         setStream(data.stream);
         setIsLive(true);
@@ -124,7 +125,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
       try {
         const res = await fetch(`${BACKEND_URL}/streams/${stream.id}/cancel`, { method: 'POST' });
         const data = await res.json();
-        
+
         // Update with final values from backend
         if (data.stream) {
           const finalStreamed = data.stream.finalStreamed || 0;
@@ -134,7 +135,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             withdrawn: data.stream.withdrawn || 0
           });
         }
-        
+
         // Update wallet balance from backend response (ALWAYS trust backend)
         const newBalance = data.walletBalance;
         const refunded = data.refunded || 0;
@@ -149,7 +150,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
         console.log('Could not cancel on backend');
       }
     }
-    
+
     setIsStreaming(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -164,20 +165,20 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
     }
     setError(null);
     setSuccess(null);
-    
+
     console.log(`[Withdraw] Attempting withdrawal from stream ${stream.id}`);
-    
+
     try {
       const res = await fetch(`${BACKEND_URL}/streams/${stream.id}/withdraw`, { method: 'POST' });
       const data = await res.json();
       console.log(`[Withdraw] Response:`, data);
-      
+
       if (data.success) {
         // Update stream with new withdrawn amount - Available becomes 0 after full withdrawal
-        setStream(prev => prev ? { 
-          ...prev, 
-          withdrawn: data.totalWithdrawn, 
-          status: data.status 
+        setStream(prev => prev ? {
+          ...prev,
+          withdrawn: data.totalWithdrawn,
+          status: data.status
         } : null);
         // Update streamedAmount to match (for cancelled streams)
         if (stream.status === 'cancelled') {
@@ -204,7 +205,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
   // Poll stream status from backend
   useEffect(() => {
     if (!stream || !isLive || !isStreaming) return;
-    
+
     const pollStatus = async () => {
       try {
         const res = await fetch(`${BACKEND_URL}/streams/${stream.id}`);
@@ -213,7 +214,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
           setStreamedAmount(data.stream.streamedAmount);
           setElapsedSeconds(data.stream.elapsedSeconds);
           setStream(data.stream);
-          
+
           if (data.stream.status !== 'active') {
             setIsStreaming(false);
           }
@@ -222,7 +223,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
         console.log('Poll error');
       }
     };
-    
+
     const interval = setInterval(pollStatus, 1000);
     return () => clearInterval(interval);
   }, [stream, isLive, isStreaming]);
@@ -249,7 +250,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
     }, 2000);
     return () => clearInterval(cleanup);
   }, []);
-  
+
   // Fetch wallet balance on mount and when sender changes
   useEffect(() => {
     fetchWalletBalance();
@@ -411,7 +412,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
               transition: 'width 0.1s linear',
               borderRadius: 20,
             }} />
-            
+
             {/* Flowing particles */}
             {isStreaming && (
               <>
@@ -434,7 +435,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
                 ))}
               </>
             )}
-            
+
             {/* Rate label */}
             <div style={{
               position: 'absolute',
@@ -475,7 +476,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
         </div>
 
         {/* Clear Balance Display: SENDER → LOCKED → RECEIVER */}
-        <div style={{ 
+        <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
           gap: 8,
@@ -495,11 +496,11 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             </div>
             <div style={{ fontSize: 9, color: isDark ? '#888' : '#666' }}>Available</div>
           </div>
-          
+
           {/* Locked in Stream */}
           <div style={{
             padding: 12,
-            background: isStreaming 
+            background: isStreaming
               ? (isDark ? 'rgba(249, 115, 22, 0.2)' : 'rgba(249, 115, 22, 0.1)')
               : (isDark ? 'rgba(100,100,100,0.1)' : 'rgba(100,100,100,0.05)'),
             borderRadius: 12,
@@ -512,7 +513,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             </div>
             <div style={{ fontSize: 9, color: isDark ? '#888' : '#666' }}>In Stream</div>
           </div>
-          
+
           {/* Receiver Balance */}
           <div style={{
             padding: 12,
@@ -528,22 +529,22 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             <div style={{ fontSize: 9, color: isDark ? '#888' : '#666' }}>Earned</div>
           </div>
         </div>
-        
+
         {/* Money Flow Visualization */}
         {isStreaming && (
-          <div style={{ 
-            textAlign: 'center', 
-            fontSize: 11, 
+          <div style={{
+            textAlign: 'center',
+            fontSize: 11,
             color: isDark ? '#888' : '#666',
             marginBottom: 8,
             padding: '4px 8px',
             background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)',
             borderRadius: 6,
           }}>
-            💰 Wallet <span style={{color:'#667eea'}}>→</span> 🔒 Locked <span style={{color:'#f97316'}}>→</span> 📤 Streamed <span style={{color:'#22c55e'}}>→</span> 🤖 Receiver
+            💰 Wallet <span style={{ color: '#667eea' }}>→</span> 🔒 Locked <span style={{ color: '#f97316' }}>→</span> 📤 Streamed <span style={{ color: '#22c55e' }}>→</span> 🤖 Receiver
           </div>
         )}
-        
+
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
           <button
@@ -582,11 +583,11 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
                 const res = await fetch(`${BACKEND_URL}/streams/wallet/${sender}/reset`, { method: 'POST' });
                 const data = await res.json();
                 console.log('[Reset] Backend response:', data);
-                
+
                 // Verify reset worked by fetching balance
                 const newBalance = await fetchWalletBalance();
                 console.log('[Reset] Verified balance:', newBalance);
-                
+
                 // Reset frontend state
                 setReceiverBalance(0);
                 setWalletHistory(['🔄 RESET']);
@@ -616,11 +617,11 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             🔄 Reset Demo
           </button>
         </div>
-        
+
         {/* How It Works - Clear Explanation */}
-        <div style={{ 
-          fontSize: 10, 
-          color: isDark ? '#888' : '#666', 
+        <div style={{
+          fontSize: 10,
+          color: isDark ? '#888' : '#666',
           marginBottom: 12,
           padding: '8px 12px',
           background: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)',
@@ -628,17 +629,17 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
           lineHeight: 1.5,
         }}>
           <div style={{ fontWeight: 700, marginBottom: 4 }}>💡 MONEY FLOW:</div>
-          <div>1. <b>Start</b> → 💰 Wallet (100) moves to 🔒 Locked (100) — <span style={{color:'#667eea'}}>Wallet shows 0!</span></div>
+          <div>1. <b>Start</b> → 💰 Wallet (100) moves to 🔒 Locked (100) — <span style={{ color: '#667eea' }}>Wallet shows 0!</span></div>
           <div>2. <b>Streaming</b> → 🔒 Locked slowly moves to 📤 Streamed</div>
           <div>3. <b>Withdraw</b> → 📤 Streamed moves to 🤖 Receiver balance</div>
           <div>4. <b>Stop</b> → 🔒 Remaining Locked returns to 💰 Wallet</div>
         </div>
-        
+
         {/* Transaction Log */}
         {walletHistory.length > 0 && (
-          <div style={{ 
-            fontSize: 10, 
-            color: isDark ? '#888' : '#666', 
+          <div style={{
+            fontSize: 10,
+            color: isDark ? '#888' : '#666',
             marginBottom: 12,
             padding: '6px 10px',
             background: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.03)',
@@ -648,21 +649,21 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             {walletHistory.slice(-3).join(' → ')}
           </div>
         )}
-        
+
         {/* Stats - Row 1: Amounts */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 12 }}>
           <StatBox label="Streamed" value={`${streamedAmount.toFixed(2)} MNEE`} color="#22c55e" isDark={isDark} />
           <StatBox label="Withdrawn" value={`${(stream?.withdrawn || 0).toFixed(2)} MNEE`} color="#3b82f6" isDark={isDark} />
           <StatBox label="Available" value={`${Math.max(0, streamedAmount - (stream?.withdrawn || 0)).toFixed(2)} MNEE`} color="#f59e0b" isDark={isDark} />
         </div>
-        
+
         {/* Stats - Row 2: Time */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
           <StatBox label="Remaining Budget" value={`${remainingBudget.toFixed(2)} MNEE`} color="#888" isDark={isDark} />
           <StatBox label="Elapsed" value={`${elapsedSeconds.toFixed(1)}s`} color="#667eea" isDark={isDark} />
           <StatBox label="ETA" value={isStreaming ? `${Math.ceil(estimatedTime)}s` : '--'} color="#888" isDark={isDark} />
         </div>
-        
+
         {stream?.id && (
           <div style={{ marginTop: 12, fontSize: 11, color: isDark ? '#555' : '#94a3b8', textAlign: 'center' }}>
             Stream ID: {stream.id}
@@ -716,7 +717,7 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             💰 Withdraw Available: {(streamedAmount - (stream?.withdrawn || 0)).toFixed(2)} MNEE
           </button>
         )}
-        
+
         {/* Streaming controls */}
         <div style={{ display: 'flex', gap: 12 }}>
           {!isStreaming ? (
@@ -756,12 +757,12 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
             </button>
           )}
         </div>
-        
+
         {/* Status after stopping */}
         {!isStreaming && stream && (stream.status === 'cancelled' || stream.status === 'completed') && (
-          <div style={{ 
-            padding: 12, 
-            borderRadius: 8, 
+          <div style={{
+            padding: 12,
+            borderRadius: 8,
             background: stream.status === 'completed' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
             border: `1px solid ${stream.status === 'completed' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
             textAlign: 'center',
@@ -776,13 +777,13 @@ export function StreamingPayments({ isDark = true }: { isDark?: boolean }) {
           </div>
         )}
       </div>
-      
+
       {error && (
         <div style={{ padding: '0 16px 16px', color: '#ef4444', fontSize: 12, textAlign: 'center' }}>
           {error}
         </div>
       )}
-      
+
       {success && (
         <div style={{ padding: '0 16px 16px', color: '#22c55e', fontSize: 13, textAlign: 'center', fontWeight: 600 }}>
           {success}

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../lib/config';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8787';
+
 
 // Agent Trust Tiers
 export type TrustTier = 'unverified' | 'bronze' | 'silver' | 'gold' | 'platinum';
@@ -108,12 +109,12 @@ export function CreditScore({ score, size = 80 }: { score: number; size?: number
 
 export function AgentCard({ agent, isDark = true, onClick }: { agent: AgentProfile; isDark?: boolean; onClick?: () => void }) {
   const tierConfig = TIER_CONFIG[agent.tier];
-  const successRate = agent.stats.totalEscrows > 0 
-    ? Math.round((agent.stats.successfulReleases / agent.stats.totalEscrows) * 100) 
+  const successRate = agent.stats.totalEscrows > 0
+    ? Math.round((agent.stats.successfulReleases / agent.stats.totalEscrows) * 100)
     : 0;
 
   return (
-    <div 
+    <div
       onClick={onClick}
       style={{
         padding: 20,
@@ -131,9 +132,9 @@ export function AgentCard({ agent, isDark = true, onClick }: { agent: AgentProfi
         {/* Agent Info */}
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <span style={{ 
-              fontFamily: 'ui-monospace', 
-              fontSize: 14, 
+            <span style={{
+              fontFamily: 'ui-monospace',
+              fontSize: 14,
               fontWeight: 600,
               color: isDark ? '#e0e0e0' : '#111'
             }}>
@@ -216,7 +217,7 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
     try {
       const res = await fetch(`${BACKEND_URL}/agents`);
       if (!res.ok) throw new Error('Failed to fetch');
-      
+
       const data = await res.json();
       if (data.success) {
         const mappedAgents: AgentProfile[] = data.agents.map((a: any) => ({
@@ -236,7 +237,7 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
           registeredAt: a.registeredAt,
           lastActive: a.lastActive,
         }));
-        
+
         setAgents(mappedAgents);
         setTierCounts(data.tiers || { platinum: 0, gold: 0, silver: 0, bronze: 0, unverified: 0 });
         setIsLive(true);
@@ -256,9 +257,9 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
       setRegisterStatus('Address required');
       return;
     }
-    
+
     setRegisterStatus('Registering...');
-    
+
     try {
       const res = await fetch(`${BACKEND_URL}/agents/register`, {
         method: 'POST',
@@ -269,7 +270,7 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
           type: 'ai'
         })
       });
-      
+
       const data = await res.json();
       if (data.success) {
         setRegisterStatus('✅ Agent registered!');
@@ -316,7 +317,7 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
       <div style={{
         padding: '16px 20px',
         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#e5e7eb'}`,
-        background: isDark 
+        background: isDark
           ? 'linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(205, 127, 50, 0.08))'
           : 'linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(205, 127, 50, 0.05))',
       }}>
@@ -383,10 +384,10 @@ export function AgentReputation({ isDark = true }: { isDark?: boolean }) {
             <div style={{ fontSize: 32, marginBottom: 12 }}>🤖</div>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>No Agents Registered Yet</div>
             <div style={{ fontSize: 12, lineHeight: 1.6 }}>
-              <strong>To register an agent:</strong><br/>
-              1. Enter an Ethereum address (0x...) below<br/>
-              2. Optionally add a name for identification<br/>
-              3. Click "Register" to add to the leaderboard<br/>
+              <strong>To register an agent:</strong><br />
+              1. Enter an Ethereum address (0x...) below<br />
+              2. Optionally add a name for identification<br />
+              3. Click "Register" to add to the leaderboard<br />
               <span style={{ fontSize: 11, color: isDark ? '#555' : '#94a3b8' }}>
                 Trust scores update automatically based on escrow performance.
               </span>

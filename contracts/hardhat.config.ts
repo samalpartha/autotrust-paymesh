@@ -22,7 +22,12 @@ const config: HardhatUserConfig = {
       chainId: 31337,
       accounts: ["0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"]
     },
-    ...(RPC_URL && DEPLOYER_PRIVATE_KEY ? {
+    ...(RPC_URL && DEPLOYER_PRIVATE_KEY && DEPLOYER_PRIVATE_KEY.length === 66 ? {
+      sepolia: {
+        url: RPC_URL,
+        accounts: [DEPLOYER_PRIVATE_KEY],
+        chainId: 11155111,
+      },
       mainnet: {
         url: RPC_URL,
         accounts: [DEPLOYER_PRIVATE_KEY],

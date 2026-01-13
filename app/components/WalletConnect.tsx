@@ -14,6 +14,7 @@ import {
   EXPLORER_URL
 } from '../lib/contracts';
 import { getSimpleGasPrice, getCongestionColor } from '../lib/gas';
+import { RPC_URL } from '../lib/config';
 import { useTheme } from '../context/ThemeContext';
 
 interface WalletConnectProps {
@@ -46,7 +47,7 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
   // Fetch gas price periodically
   useEffect(() => {
     const fetchGas = async () => {
-      const rpcUrl = IS_LOCAL ? "http://127.0.0.1:8545" : undefined;
+      const rpcUrl = IS_LOCAL ? RPC_URL : undefined;
       const price = await getSimpleGasPrice(rpcUrl);
       setGasPrice(price);
     };
@@ -210,7 +211,7 @@ export function WalletConnect({ variant = 'primary' }: WalletConnectProps) {
                 <div>
                   <strong>Local Development Mode</strong>
                   <div style={{ fontSize: 12, marginTop: 4 }}>
-                    Add network in MetaMask: RPC <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>https://autotrust-chain-108816008638.us-central1.run.app</code>, Chain ID <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>31337</code>
+                    Add network in MetaMask: RPC <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>{IS_LOCAL ? 'https://autotrust-chain-108816008638.us-central1.run.app' : 'https://autotrust-chain-108816008638.us-central1.run.app'}</code>, Chain ID <code style={{ background: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: 4 }}>31337</code>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { BACKEND_URL } from '../lib/config';
 import { TrustBadge, getTierFromScore } from './AgentReputation';
 
 interface NegotiationMessage {
@@ -30,7 +31,7 @@ interface Negotiation {
   linkedEscrow?: LinkedEscrow;
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8787';
+
 
 const AGENT_A = { name: 'BuyerBot', address: '0x742d...8aB12', score: 87, avatar: '🤖' };
 const AGENT_B = { name: 'SellerAI', address: '0x8ba1...DBA72', score: 62, avatar: '🧠' };
@@ -51,14 +52,14 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
   // Link escrow to negotiation
   const linkEscrowToNegotiation = async (escrowId: string, txHash?: string) => {
     if (!negotiation?.id) return;
-    
+
     try {
       const res = await fetch(`${BACKEND_URL}/negotiate/${negotiation.id}/link-escrow`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ escrowId, txHash })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setLinkedEscrowId(escrowId);
@@ -73,14 +74,14 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
   // Update escrow status in negotiation
   const updateEscrowStatus = async (status: string, txHash?: string) => {
     if (!negotiation?.id) return;
-    
+
     try {
       const res = await fetch(`${BACKEND_URL}/negotiate/${negotiation.id}/escrow-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, txHash })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         setEscrowStatus(status);
@@ -104,9 +105,9 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
   // Create escrow from agreed terms
   const createEscrowFromAgreement = async () => {
     if (!negotiation?.agreedTerms) return;
-    
+
     setCreatingEscrow(true);
-    
+
     try {
       // Call backend to prepare escrow creation
       const res = await fetch(`${BACKEND_URL}/escrows/prepare`, {
@@ -120,15 +121,15 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
           seller: AGENT_B.address,
         })
       });
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.success) {
           setEscrowCreated(true);
           if (onAgreement) {
-            onAgreement({ 
-              amount: negotiation.agreedTerms.amount, 
-              description: taskDescription 
+            onAgreement({
+              amount: negotiation.agreedTerms.amount,
+              description: taskDescription
             });
           }
         } else {
@@ -138,9 +139,9 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
         // If backend doesn't have prepare endpoint, just show success
         setEscrowCreated(true);
         if (onAgreement) {
-          onAgreement({ 
-            amount: negotiation.agreedTerms.amount, 
-            description: taskDescription 
+          onAgreement({
+            amount: negotiation.agreedTerms.amount,
+            description: taskDescription
           });
         }
       }
@@ -175,12 +176,12 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
       });
 
       if (!res.ok) throw new Error('Backend unavailable');
-      
+
       const data = await res.json();
       if (data.success) {
         setNegotiation(data.negotiation);
         setIsLive(true);
-        
+
         // Animate messages appearing
         const msgs = data.negotiation.messages;
         for (let i = 0; i < msgs.length; i++) {
@@ -246,11 +247,11 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
             <div style={{
               padding: '6px 12px',
               borderRadius: 20,
-              background: currentStatus === 'agreed' ? 'rgba(34, 197, 94, 0.15)' : 
-                          currentStatus === 'failed' ? 'rgba(239, 68, 68, 0.15)' : 
-                          'rgba(245, 158, 11, 0.15)',
-              color: currentStatus === 'agreed' ? '#22c55e' : 
-                     currentStatus === 'failed' ? '#ef4444' : '#f59e0b',
+              background: currentStatus === 'agreed' ? 'rgba(34, 197, 94, 0.15)' :
+                currentStatus === 'failed' ? 'rgba(239, 68, 68, 0.15)' :
+                  'rgba(245, 158, 11, 0.15)',
+              color: currentStatus === 'agreed' ? '#22c55e' :
+                currentStatus === 'failed' ? '#ef4444' : '#f59e0b',
               fontSize: 11,
               fontWeight: 600,
             }}>
@@ -322,9 +323,9 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
       )}
 
       {/* Chat Messages */}
-      <div style={{ 
-        maxHeight: 300, 
-        overflowY: 'auto', 
+      <div style={{
+        maxHeight: 300,
+        overflowY: 'auto',
         padding: 16,
         background: isDark ? 'rgba(0,0,0,0.2)' : '#fafafa',
       }}>
@@ -333,8 +334,8 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
             <div style={{ fontSize: 32, marginBottom: 12 }}>🤖 ↔️ 🧠</div>
             <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>No Negotiation In Progress</div>
             <div style={{ fontSize: 12, lineHeight: 1.5 }}>
-              <strong>To start:</strong> Describe the task and initial offer above,<br/>
-              then click "🚀 Start AI Negotiation".<br/>
+              <strong>To start:</strong> Describe the task and initial offer above,<br />
+              then click "🚀 Start AI Negotiation".<br />
               <span style={{ fontSize: 11, color: isDark ? '#555' : '#94a3b8' }}>
                 AI agents will negotiate terms automatically via backend API.
               </span>
@@ -442,8 +443,8 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
                   padding: '12px 20px',
                   borderRadius: 12,
                   border: 'none',
-                  background: creatingEscrow 
-                    ? 'rgba(34, 197, 94, 0.5)' 
+                  background: creatingEscrow
+                    ? 'rgba(34, 197, 94, 0.5)'
                     : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
                   color: '#fff',
                   fontSize: 14,
@@ -465,8 +466,8 @@ export function NegotiationSandbox({ isDark = true, onAgreement }: { isDark?: bo
               padding: '12px 20px',
               borderRadius: 12,
               border: 'none',
-              background: isSimulating 
-                ? 'rgba(102, 126, 234, 0.5)' 
+              background: isSimulating
+                ? 'rgba(102, 126, 234, 0.5)'
                 : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               color: '#fff',
               fontSize: 14,
@@ -524,10 +525,10 @@ function MessageBubble({ message, isDark }: { message: NegotiationMessage; isDar
         maxWidth: '80%',
         padding: '12px 16px',
         borderRadius: isBuyer ? '16px 16px 16px 4px' : '16px 16px 4px 16px',
-        background: isBuyer 
+        background: isBuyer
           ? (isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(99, 102, 241, 0.1)')
           : (isDark ? 'rgba(118, 75, 162, 0.2)' : 'rgba(139, 92, 246, 0.1)'),
-        border: `1px solid ${isBuyer 
+        border: `1px solid ${isBuyer
           ? (isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(99, 102, 241, 0.2)')
           : (isDark ? 'rgba(118, 75, 162, 0.3)' : 'rgba(139, 92, 246, 0.2)')}`,
       }}>
