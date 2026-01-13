@@ -14,7 +14,7 @@ import { WagmiProvider, http } from "wagmi";
 import { mainnet } from "wagmi/chains";
 import { createConfig, type Chain } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { injected, coinbaseWallet } from "wagmi/connectors";
+import { injected } from "wagmi/connectors"; // Only use injected
 import { ThemeProvider } from "../context/ThemeContext";
 import { ToastProvider } from "../components/Toast";
 
@@ -43,7 +43,7 @@ const hardhatLocal: Chain = {
   name: "Hardhat Local",
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
-    default: { http: ["http://127.0.0.1:8545"] },
+    default: { http: [process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"] },
   },
   testnet: true,
 };
@@ -68,17 +68,12 @@ const config = createConfig({
     injected({
       shimDisconnect: true,
     }),
-    // Coinbase Wallet
-    coinbaseWallet({
-      appName: "AutoTrust Paymesh",
-      headlessMode: true,
-    }),
   ],
   transports: {
     [mainnet.id]: http(
       process.env.NEXT_PUBLIC_ETH_RPC_URL || "https://mainnet.infura.io/v3/6f5c968a7b2f4d808d99f7ad8a258d65"
     ),
-    [hardhatLocal.id]: http("http://127.0.0.1:8545"),
+    [hardhatLocal.id]: http(process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"),
   },
   ssr: true,
 });
